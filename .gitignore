@@ -1,0 +1,7 @@
+.vscode
+*pycache*
+.pytest_cache
+*.pub
+*.sql
+venv
+node_modules
