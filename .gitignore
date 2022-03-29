@@ -5,3 +5,6 @@
 *.sql
 venv
 node_modules
+activate
+build
+temp
