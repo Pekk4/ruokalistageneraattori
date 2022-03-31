@@ -11,3 +11,4 @@ def index():
     meals = repo.find_all_meals()
 
     return render_template("index.html", meals=meals)
+
