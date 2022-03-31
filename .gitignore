@@ -1,11 +1,11 @@
 .vscode
-*pycache*
-.pytest_cache
-*.pub
-*.sql
+*cache*
 venv
 node_modules
 activate
 build
 temp
 .env
+htmlcov
+.coverage
+
