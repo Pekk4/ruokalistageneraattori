@@ -1,0 +1,30 @@
+
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - development
+  pull_request:
+    branches:
+      - master
+      - development
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: pip install -r requirements
+      - name: Run pylint
+        run: pylint src --rcfile=".pylintrc"
+      - name: Run tests
+        run: coverage run --branch -m pytest
+      - name: Coverage report
+        run: coverage xml
