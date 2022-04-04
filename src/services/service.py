@@ -5,4 +5,6 @@ class Service:
         self.repository = repository
 
     def provide_meals(self):
-        return self.repository.find_all_meals()
+        meals = self.repository.find_all_meals()
+
+        return meals
