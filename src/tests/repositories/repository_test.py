@@ -69,3 +69,20 @@ class TestRepository(unittest.TestCase):
             self.repository.add_user("Paavo Pesusieni", "Rapuleipä_666")
 
         self.assertEqual(str(error.exception), "Vituixmän")
+
+    def test_find_single_user_calls_database_methods(self):
+        query = "SELECT username, password FROM users WHERE username=:username"
+        user = {"username":"Tohtori Sykerö"}
+
+        self.repository.find_single_user(user["username"])
+
+        self.db_session_mock.execute.assert_called_with(query, (user,))
+        self.return_on_select_mock.fetchall.assert_called()
+
+    def test_find_single_user_returns_something(self):
+        self.test_item_1.name = "Tohtori Sykerö"
+
+        result = self.repository.find_single_user("Lordi Voldemort")[0]
+
+        self.assertEqual(result.name, "Tohtori Sykerö")
+        self.assertIsInstance(result, Mock)

@@ -23,9 +23,7 @@ class Repository:
     def find_single_user(self, username):
         print(username)
         query = "SELECT username, password FROM users WHERE username=:username"
-        result = self._read_it_from_database(query, {"username":username})
-
-        #self.database.session.execute(query, {"username":username})
+        result = self._read_from_database(query, {"username":username})
 
         return result
 
@@ -37,17 +35,7 @@ class Repository:
         except Exception:
             raise
 
-    def _read_from_database(self, query):
-        try:
-            rows = self.database.session.execute(query)
-            results = rows.fetchall()
-
-            return results
-
-        except Exception:
-            raise
-
-    def _read_it_from_database(self, query, items):
+    def _read_from_database(self, query, *items):
         try:
             rows = self.database.session.execute(query, items)
             results = rows.fetchall()
