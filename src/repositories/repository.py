@@ -15,6 +15,19 @@ class Repository:
 
         return meals
 
+    def add_user(self, username, password):
+        query = "INSERT INTO users (username, password) VALUES (:username, :password)"
+
+        self._write(query, {"username":username, "password":password})
+
+    def _write(self, query, items):
+        try:
+            self.database.session.execute(query, items)
+            self.database.session.commit()
+            
+        except Exception:
+            raise
+
     def _read_from_database(self, query):
         try:
             rows = self.database.session.execute(query)

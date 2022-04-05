@@ -8,4 +8,4 @@ temp
 .env
 htmlcov
 .coverage
-
+*.swp

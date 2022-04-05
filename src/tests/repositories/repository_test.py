@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from entities.meal import Meal
 from repositories.repository import Repository
 
@@ -50,5 +50,22 @@ class TestRepository(unittest.TestCase):
 
         with self.assertRaises(Exception) as error:
             self.repository.find_all_meals()
+
+        self.assertEqual(str(error.exception), "Vituixmän")
+
+    def test_add_user_calls_database_methods(self):
+        creds = {"username":"Paavo Pesusieni", "password":"Rapuleipä_666"}
+        query = "INSERT INTO users (username, password) VALUES (:username, :password)"
+
+        self.repository.add_user(creds["username"], creds["password"])
+
+        self.db_session_mock.execute.assert_called_with(query, creds)
+        self.db_session_mock.commit.assert_called()
+
+    def test_add_user_on_exception(self):
+        self.db_session_mock.execute.side_effect = Exception('Vituixmän')
+
+        with self.assertRaises(Exception) as error:
+            self.repository.add_user("Paavo Pesusieni", "Rapuleipä_666")
 
         self.assertEqual(str(error.exception), "Vituixmän")
