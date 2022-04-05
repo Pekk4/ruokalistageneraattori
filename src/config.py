@@ -8,3 +8,4 @@ if path.exists(envfile_path):
     load_dotenv(envfile_path)
 
 DATABASE_URL = getenv("DATABASE_URL")
+SECRET_KEY = getenv("SECRET_KEY")

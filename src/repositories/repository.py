@@ -20,6 +20,15 @@ class Repository:
 
         self._write(query, {"username":username, "password":password})
 
+    def find_single_user(self, username):
+        print(username)
+        query = "SELECT username, password FROM users WHERE username=:username"
+        result = self._read_it_from_database(query, {"username":username})
+
+        #self.database.session.execute(query, {"username":username})
+
+        return result
+
     def _write(self, query, items):
         try:
             self.database.session.execute(query, items)
@@ -31,6 +40,16 @@ class Repository:
     def _read_from_database(self, query):
         try:
             rows = self.database.session.execute(query)
+            results = rows.fetchall()
+
+            return results
+
+        except Exception:
+            raise
+
+    def _read_it_from_database(self, query, items):
+        try:
+            rows = self.database.session.execute(query, items)
             results = rows.fetchall()
 
             return results
