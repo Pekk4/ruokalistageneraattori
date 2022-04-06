@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import Mock
-from services.service import Service
 from entities.meal import Meal
+from services.service import Service
 
 class TestService(unittest.TestCase):
 
@@ -22,3 +22,27 @@ class TestService(unittest.TestCase):
 
         self.assertEqual(len(value), 2)
         self.assertIsInstance(value[0], Meal)
+
+    def test_insert_new_user_calls_repository_methods(self):        
+        self.service.insert_new_user("Paavo", "Pesusieni")
+
+        self.repository_mock.add_user.assert_called()
+        self.assertTrue("Paavo" in self.repository_mock.add_user.call_args[0])
+
+    def test_insert_new_user_throws_exception_without_arguments(self):
+        with self.assertRaises(TypeError):
+            self.service.insert_new_user()
+
+    def test_login_user_calls_repository_methods(self):
+        self.service.login_user("Paavo", "Pesusieni")
+
+        self.repository_mock.find_single_user.has_called_with("Paavo")
+
+    def test_login_user_returns_False_when_no_results(self):
+        self.assertFalse(self.service.login_user("Hölkyn", "Kölkyn"))
+
+    def test_login_user_throws_exception_without_arguments(self):
+        with self.assertRaises(TypeError):
+            self.service.login_user()
+
+    # Hash täytyy testailla vielä
