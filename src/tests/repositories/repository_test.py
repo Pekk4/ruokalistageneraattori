@@ -1,88 +1,86 @@
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 from entities.meal import Meal
 from repositories.repository import Repository
 
 class TestRepository(unittest.TestCase):
 
     def setUp(self):
+        self.io_mock = Mock()
         self.test_item_1 = Mock()
         self.test_item_2 = Mock()
-        self.database_mock = Mock()
-        self.db_session_mock = Mock()
-        self.return_on_select_mock = Mock()
 
         self.test_results = [self.test_item_1, self.test_item_2]
+        self.credentials = {"username":"Paavo Pesusieni", "password":"Rapuleipä_666"}
 
-        self._configure_mocks()
-
-        self.repository = Repository(self.database_mock)
-
-    def _configure_mocks(self):
         self.test_item_1.name = "Surströmming"
         self.test_item_2.name = "Pepparkakor"
-        self.db_session_mock.execute.return_value = self.return_on_select_mock
-        self.return_on_select_mock.fetchall.return_value = self.test_results
-        self.database_mock.attach_mock(self.db_session_mock, "session")
+        self.io_mock.read.return_value = self.test_results
 
-    def test_find_all_meals_calls_database_methods(self):
+        self.repository = Repository(self.io_mock)
+
+    def test_find_all_meals_calls_read_correct(self):
         self.repository.find_all_meals()
 
-        self.db_session_mock.execute.assert_called()
-        self.return_on_select_mock.fetchall.assert_called()
+        self.io_mock.read.assert_called_with("SELECT name FROM meals")
 
-    def test_find_all_meals_returns_correct_object_when_is_results(self):
-        value = self.repository.find_all_meals()
+    def test_find_all_meals_returns_correct_when_is_results(self):
+        results = self.repository.find_all_meals()
 
-        self.assertEqual(len(value), 2)
-        self.assertIsInstance(value[0], Meal)
-        self.assertEqual(value[0].name, self.test_item_1.name)
+        self.assertEqual(len(results), 2)
+        self.assertIsInstance(results[0], Meal)
+        self.assertEqual(results[0].name, self.test_item_1.name)
 
-    def test_find_all_meals_returns_correct_object_when_no_results(self):
-        self.return_on_select_mock.fetchall.return_value = []
-        value = self.repository.find_all_meals()
+    def test_find_all_meals_returns_correct_when_no_results(self):
+        self.io_mock.read.return_value = []
+        result = self.repository.find_all_meals()
 
-        self.assertIsInstance(value, list)
-        self.assertEqual(len(value), 0)
+        self.assertIsInstance(result, list)
+        self.assertEqual(len(result), 0)
 
-    def test_find_all_meals_on_exception(self):
-        self.db_session_mock.execute.side_effect = Exception('Vituixmän')
+    def test_find_all_meals_calls_does_not_call_read_incorrect(self):
+        with self.assertRaises(AssertionError):
+            self.io_mock.read.assert_called_with("Nönnönnöö")
 
-        with self.assertRaises(Exception) as error:
+    def test_find_all_meals_throws_exception_when_incorrect_result_type(self):
+        self.io_mock.read.return_value = [None]
+
+        with self.assertRaises(AttributeError):
             self.repository.find_all_meals()
 
-        self.assertEqual(str(error.exception), "Vituixmän")
-
-    def test_add_user_calls_database_methods(self):
-        creds = {"username":"Paavo Pesusieni", "password":"Rapuleipä_666"}
+    def test_add_user_calls_write_correct(self):
         query = "INSERT INTO users (username, password) VALUES (:username, :password)"
 
-        self.repository.add_user(creds["username"], creds["password"])
+        self.repository.add_user(self.credentials["username"], self.credentials["password"])
 
-        self.db_session_mock.execute.assert_called_with(query, creds)
-        self.db_session_mock.commit.assert_called()
+        self.io_mock.write.assert_called_with(query, self.credentials)
 
-    def test_add_user_on_exception(self):
-        self.db_session_mock.execute.side_effect = Exception('Vituixmän')
+    def test_add_user_throws_exception_without_arguments(self):
+        with self.assertRaises(TypeError):
+            self.repository.add_user()
 
-        with self.assertRaises(Exception) as error:
-            self.repository.add_user("Paavo Pesusieni", "Rapuleipä_666")
-
-        self.assertEqual(str(error.exception), "Vituixmän")
-
-    def test_find_single_user_calls_database_methods(self):
+    def test_find_single_user_calls_read_correct(self):
         query = "SELECT username, password FROM users WHERE username=:username"
-        user = {"username":"Tohtori Sykerö"}
+        test_dict = {"username":self.credentials["username"]}
 
-        self.repository.find_single_user(user["username"])
+        self.repository.find_single_user(self.credentials["username"])
 
-        self.db_session_mock.execute.assert_called_with(query, (user,))
-        self.return_on_select_mock.fetchall.assert_called()
+        self.io_mock.read.assert_called_with(query, test_dict)
 
-    def test_find_single_user_returns_something(self):
-        self.test_item_1.name = "Tohtori Sykerö"
+    def test_find_single_user_returns_correct_when_is_results(self):
+        result = self.repository.find_single_user(self.credentials["username"])
 
-        result = self.repository.find_single_user("Lordi Voldemort")[0]
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].name, self.test_item_1.name)
+        self.assertNotIsInstance(result[0], Meal)
 
-        self.assertEqual(result.name, "Tohtori Sykerö")
-        self.assertIsInstance(result, Mock)
+    def test_find_single_user_returns_correct_when_no_results(self):
+        self.io_mock.read.return_value = []
+        result = self.repository.find_all_meals()
+
+        self.assertIsInstance(result, list)
+        self.assertEqual(len(result), 0)
+
+    def test_find_single_user_throws_exception_without_arguments(self):
+        with self.assertRaises(TypeError):
+            self.repository.find_single_user()

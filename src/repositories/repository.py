@@ -1,12 +1,12 @@
-from database import database as default_db
+from repositories.io import InputOutput as default_io
 from entities.meal import Meal
 
 class Repository:
-    def __init__(self, database=default_db):
-        self.database = database
+    def __init__(self, input_output=default_io()):
+        self.i_o = input_output
 
     def find_all_meals(self):
-        results = self._read_from_database("SELECT name FROM meals")
+        results = self.i_o.read("SELECT name FROM meals")
 
         if len(results) == 0:
             return results
@@ -18,29 +18,11 @@ class Repository:
     def add_user(self, username, password):
         query = "INSERT INTO users (username, password) VALUES (:username, :password)"
 
-        self._write(query, {"username":username, "password":password})
+        self.i_o.write(query, {"username":username, "password":password})
 
     def find_single_user(self, username):
-        print(username)
         query = "SELECT username, password FROM users WHERE username=:username"
-        result = self._read_from_database(query, {"username":username})
+
+        result = self.i_o.read(query, {"username":username})
 
         return result
-
-    def _write(self, query, items):
-        try:
-            self.database.session.execute(query, items)
-            self.database.session.commit()
-            
-        except Exception:
-            raise
-
-    def _read_from_database(self, query, *items):
-        try:
-            rows = self.database.session.execute(query, items)
-            results = rows.fetchall()
-
-            return results
-
-        except Exception:
-            raise
