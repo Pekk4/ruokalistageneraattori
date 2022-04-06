@@ -15,11 +15,14 @@ class TestRepository(unittest.TestCase):
         self.variables = {"variable1":"Abrakadabra", "variable2":"Alohomora"}
         self.exception = Exception("Vituixmän")
 
+        self._configure_mocks()
+
+        self.input_output = InputOutput(self.database_mock)
+
+    def _configure_mocks(self):
         self.db_session_mock.execute.return_value = self.return_on_select_mock
         self.return_on_select_mock.fetchall.return_value = self.test_results
         self.database_mock.attach_mock(self.db_session_mock, "session")
-
-        self.input_output = InputOutput(self.database_mock)
 
     def test_read_calls_database_methods_without_variables(self):
         self.input_output.read(self.select_query)

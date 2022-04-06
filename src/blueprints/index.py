@@ -11,11 +11,6 @@ def index():
 
     return render_template("index.html", meals=meals)
 
-@index_blueprint.route("/test")
-def test():
-    value = serv.insert_new_user()
-    return str(value)
-
 @index_blueprint.route("/logout")
 def logout():
     del session["username"]

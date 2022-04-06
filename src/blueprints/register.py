@@ -1,5 +1,4 @@
 from flask import redirect, render_template, Blueprint, request
-from werkzeug.security import generate_password_hash
 from services.service import Service
 
 service = Service()

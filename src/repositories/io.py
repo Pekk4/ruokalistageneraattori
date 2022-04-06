@@ -11,7 +11,7 @@ class InputOutput:
 
             return results
 
-        except Exception:
+        except Exception: # pylint: disable=W0706
             raise
 
     def write(self, query, items):
@@ -19,7 +19,7 @@ class InputOutput:
             self.connection.session.execute(query, items)
             self.connection.commit()
 
-        except Exception:
+        except Exception: # pylint: disable=W0706
             raise
 
     def run_database_command(self, query):
@@ -27,5 +27,5 @@ class InputOutput:
             self.connection.session.execute(query)
             self.connection.commit()
 
-        except Exception:
+        except Exception: # pylint: disable=W0706
             raise

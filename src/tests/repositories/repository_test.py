@@ -57,7 +57,7 @@ class TestRepository(unittest.TestCase):
 
     def test_add_user_throws_exception_without_arguments(self):
         with self.assertRaises(TypeError):
-            self.repository.add_user()
+            self.repository.add_user() # pylint: disable=E1120
 
     def test_find_single_user_calls_read_correct(self):
         query = "SELECT username, password FROM users WHERE username=:username"
