@@ -1,15 +1,22 @@
 from argon2 import PasswordHasher
 from repositories.repository import Repository as default_repository
+from services.generator import GeneratorService
 
 class Service:
     def __init__(self, repository=default_repository()):
         self.repository = repository
+        self.generator = GeneratorService(self.repository)
         self.password_hasher = PasswordHasher()
-
-    def provide_meals(self):
+    
+    def fetch_meals(self):
         meals = self.repository.find_all_meals()
 
         return meals
+    
+    """def provide_meals(self):
+        meals = self.generator.generate()
+
+        return meals"""
 
     def insert_new_user(self, username, password):
         hash_value = self.password_hasher.hash(password)

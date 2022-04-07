@@ -7,7 +7,7 @@ serv = Service()
 
 @index_blueprint.route("/")
 def index():
-    meals = serv.provide_meals()
+    meals = serv.fetch_meals()
 
     return render_template("index.html", meals=meals)
 
