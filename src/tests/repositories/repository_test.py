@@ -1,86 +1,80 @@
 import unittest
-from unittest.mock import Mock
+from unittest.mock import patch
 from entities.meal import Meal
 from repositories.repository import Repository
 
 class TestRepository(unittest.TestCase):
 
     def setUp(self):
-        self.io_mock = Mock()
-        self.test_item_1 = Mock()
-        self.test_item_2 = Mock()
+        self.repository = Repository(None)
 
-        self.test_results = [self.test_item_1, self.test_item_2]
-        self.credentials = {"username":"Paavo Pesusieni", "password":"Rapuleipä_666"}
-
-        self.test_item_1.name = "Surströmming"
-        self.test_item_2.name = "Pepparkakor"
-        self.io_mock.read.return_value = self.test_results
-
-        self.repository = Repository(self.io_mock)
-
-    def test_find_all_meals_calls_read_correct(self):
+    @patch("repositories.base_repository.BaseRepository.read_items")
+    def test_find_all_meals_calls_super_object_correctly(self, patched_mock):
         self.repository.find_all_meals()
 
-        self.io_mock.read.assert_called_with("SELECT name FROM meals")
+        patched_mock.assert_called_with("SELECT name FROM meals")
 
-    def test_find_all_meals_returns_correct_when_is_results(self):
-        results = self.repository.find_all_meals()
+    @patch("repositories.base_repository.BaseRepository.read_items")
+    def test_find_all_meals_returns_correct_when_no_results(self, patched_mock):
+        patched_mock.return_value = []
 
-        self.assertEqual(len(results), 2)
-        self.assertIsInstance(results[0], Meal)
-        self.assertEqual(results[0].name, self.test_item_1.name)
-
-    def test_find_all_meals_returns_correct_when_no_results(self):
-        self.io_mock.read.return_value = []
         result = self.repository.find_all_meals()
 
-        self.assertIsInstance(result, list)
         self.assertEqual(len(result), 0)
+        self.assertIsInstance(result, list)
 
-    def test_find_all_meals_calls_does_not_call_read_incorrect(self):
-        with self.assertRaises(AssertionError):
-            self.io_mock.read.assert_called_with("Nönnönnöö")
+    @patch("repositories.base_repository.BaseRepository.read_items")
+    def test_find_all_meals_returns_correct_when_is_results(self, patched_mock):
+        patched_mock.return_value = [Meal("Surströmming"), Meal("Pepparkakor")]
 
-    def test_find_all_meals_throws_exception_when_incorrect_result_type(self):
-        self.io_mock.read.return_value = [None]
-
-        with self.assertRaises(AttributeError):
-            self.repository.find_all_meals()
-
-    def test_add_user_calls_write_correct(self):
-        query = "INSERT INTO users (username, password) VALUES (:username, :password)"
-
-        self.repository.add_user(self.credentials["username"], self.credentials["password"])
-
-        self.io_mock.write.assert_called_with(query, self.credentials)
-
-    def test_add_user_throws_exception_without_arguments(self):
-        with self.assertRaises(TypeError):
-            self.repository.add_user() # pylint: disable=E1120
-
-    def test_find_single_user_calls_read_correct(self):
-        query = "SELECT username, password FROM users WHERE username=:username"
-        test_dict = {"username":self.credentials["username"]}
-
-        self.repository.find_single_user(self.credentials["username"])
-
-        self.io_mock.read.assert_called_with(query, test_dict)
-
-    def test_find_single_user_returns_correct_when_is_results(self):
-        result = self.repository.find_single_user(self.credentials["username"])
+        result = self.repository.find_all_meals()
 
         self.assertEqual(len(result), 2)
-        self.assertEqual(result[0].name, self.test_item_1.name)
-        self.assertNotIsInstance(result[0], Meal)
+        self.assertIsInstance(result[1], Meal)
+        self.assertEqual(result[0].name, "Surströmming")
 
-    def test_find_single_user_returns_correct_when_no_results(self):
-        self.io_mock.read.return_value = []
-        result = self.repository.find_all_meals()
+    @patch("repositories.base_repository.BaseRepository.write_items")
+    def test_add_user_calls_super_object_correctly(self, patched_mock):
+        query = "INSERT INTO users (username, password) VALUES (:username, :password)"
+        parameters = {"username":"Aku Ankka", "password":"Pulivari313"}
 
-        self.assertIsInstance(result, list)
+        self.repository.add_user(parameters["username"], parameters["password"])
+
+        patched_mock.assert_called_with(query, parameters)
+
+    @patch("repositories.base_repository.BaseRepository.write_items")
+    def test_add_user_super_method_with_incorrect_assertion(self, patched_mock):
+        parameters = {"username":"Aku Ankka", "password":"Pulivari313"}
+
+        self.repository.add_user(parameters["username"], parameters["password"])
+
+        with self.assertRaises(AssertionError):
+            
+            patched_mock.assert_called_with("Any key...")
+
+    @patch("repositories.base_repository.BaseRepository.read_items")
+    def test_find_single_user_calls_super_object_correctly(self, patched_mock):
+        query = "SELECT username, password FROM users WHERE username=:username"
+        parameters = {"username":"Tohtori Sykerö"}
+
+        self.repository.find_single_user(parameters["username"])
+
+        patched_mock.assert_called_with(query, parameters)
+
+    @patch("repositories.base_repository.BaseRepository.read_items")
+    def test_find_single_user_returns_correct_object_when_no_results(self, patched_mock):
+        patched_mock.return_value = []
+
+        result = self.repository.find_single_user("Komisario Palmu")
+
         self.assertEqual(len(result), 0)
+        self.assertIsInstance(result, list)
 
-    def test_find_single_user_throws_exception_without_arguments(self):
-        with self.assertRaises(TypeError):
-            self.repository.find_single_user()
+    @patch("repositories.base_repository.BaseRepository.read_items")
+    def test_find_single_user_returns_correct_object_when_is_results(self, patched_mock):
+        patched_mock.return_value = [666]
+
+        result = self.repository.find_single_user("Mustakaapu")
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0], 666)
