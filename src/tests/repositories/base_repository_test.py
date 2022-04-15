@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import Mock
 from repositories.base_repository import BaseRepository
 
+
 class TestBaseRepository(unittest.TestCase):
 
     def setUp(self):

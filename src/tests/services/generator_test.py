@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import Mock
 from services.generator import GeneratorService, NotEnoughMealsError
+from entities.menu import Menu
 
 
 class TestService(unittest.TestCase):
@@ -24,8 +25,9 @@ class TestService(unittest.TestCase):
 
         self.assertEqual(str(error.exception), "Not enough meals in the database")
 
-    def test_generate_returns_list_of_seven_objects(self):
+    def test_generate_returns_correct_object(self):
         menu = self.service.generate()
 
-        self.assertEqual(len(menu), 7)
-        self.assertIsInstance(menu, list)
+        self.assertIsInstance(menu, Menu)
+        self.assertEqual(len(menu.meals), 7)
+        self.assertIsInstance(menu.meals, list)

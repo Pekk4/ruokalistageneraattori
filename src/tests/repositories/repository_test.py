@@ -12,7 +12,7 @@ class TestRepository(unittest.TestCase):
     def test_find_all_meals_calls_super_object_correctly(self, patched_mock):
         self.repository.find_all_meals()
 
-        patched_mock.assert_called_with("SELECT name FROM meals")
+        patched_mock.assert_called_with("SELECT name, id FROM meals")
 
     @patch("repositories.base_repository.BaseRepository.read_items")
     def test_find_all_meals_returns_correct_when_no_results(self, patched_mock):
