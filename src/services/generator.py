@@ -1,5 +1,6 @@
 from random import randint, shuffle
-
+from datetime import datetime
+from entities.menu import Menu
 
 class GeneratorService:
     def __init__(self, repository):
@@ -20,7 +21,7 @@ class GeneratorService:
 
         shuffle(generated_menu)
 
-        return generated_menu
+        return Menu(generated_menu, datetime.now())
 
 class NotEnoughMealsError(Exception):
     pass
