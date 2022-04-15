@@ -9,12 +9,12 @@ class Repository(BaseRepository):
         super().__init__(database)
 
     def find_all_meals(self):
-        results = super().read_items("SELECT name FROM meals")
+        results = super().read_items("SELECT name, id FROM meals")
 
         if len(results) == 0:
             return results
 
-        meals = [Meal(meal.name) for meal in results]
+        meals = [Meal(meal.name, meal.id) for meal in results]
 
         return meals
 
