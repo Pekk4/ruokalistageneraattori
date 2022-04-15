@@ -7,11 +7,17 @@ serv = Service()
 
 @index_blueprint.route("/")
 def index():
-    meals = serv.fetch_meals()
+    meals = serv.fetch_menu()
 
     return render_template("index.html", meals=meals)
 
 @index_blueprint.route("/logout")
 def logout():
     del session["username"]
+    return redirect("/")
+
+@index_blueprint.route("/generate")
+def generate():
+    serv.generate_menu()
+
     return redirect("/")
