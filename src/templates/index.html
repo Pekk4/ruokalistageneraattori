@@ -10,23 +10,25 @@
       {% if session.username %}
         <a href="/logout">Kirjaudu ulos</a>
         <div class="container 2xl mx-auto m-14 content-center border-2 border-black">
-            <div id="header" class='m-20'>
-              <h1 class="text-center text-5xl font-bold">Tervetuloa!</h1>
-            </div>
-            <div><h1 class="text-center text-xl font-bold">Ruokalista:</h1></div>
-            <div id="content-wrapper" class="m-20 grid grid-cols-7 gap-x-2 text-center">
-              
-              {% for meal in meals %}
-
-              <div class="border-2 border-black ">
-                <h1 class="">Måndag:</h1>
-                <p>{{ meal.name }}</p>
-              </div>
-
-              {% endfor %}
-
-            </div>
+          <div id="header" class='m-20'>
+            <h1 class="text-center text-5xl font-bold">Tervetuloa!</h1>
           </div>
+          <div><h1 class="text-center text-xl font-bold">Ruokalista:</h1></div>
+          <div id="content-wrapper" class="m-20 grid grid-cols-7 gap-x-2 text-center">
+            
+            {% for meal in meals.meals %}
+
+            <div class="border-2 border-black ">
+              <h1 class="">Måndag:</h1>
+              <p>{{ meal.name }}</p>
+            </div>
+
+            {% endfor %}
+
+          </div>
+        </div>
+        <!--<button onclick="location.reload();">Generoi ruokalista</button>-->
+        <button onclick="location.replace('/generate');">Generoi ruokalista</button>
       {% else %}
       <a href="/login_page">Kirjaudu sisään</a>
       <p>tai</p>
