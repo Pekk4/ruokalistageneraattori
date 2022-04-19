@@ -9,3 +9,4 @@ temp
 htmlcov
 .coverage
 *.swp
+test.py
