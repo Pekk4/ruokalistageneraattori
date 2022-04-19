@@ -44,3 +44,8 @@ class Service:
 
     def add_meal(self, meal):
         self.repository.insert_meal(meal)
+
+    def fetch_meals(self):
+        meals = self.repository.find_all_meals()
+
+        return meals

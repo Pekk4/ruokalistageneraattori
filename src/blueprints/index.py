@@ -1,4 +1,3 @@
-from crypt import methods
 from flask import redirect, render_template, Blueprint, request, session
 from services.service import Service
 
@@ -25,7 +24,9 @@ def generate():
 
 @index_blueprint.route("/meals")
 def meals():
-    return render_template("add_meal.html")
+    meals = serv.fetch_meals()
+
+    return render_template("add_meal.html", meals=meals)
 
 @index_blueprint.route("/add_meal", methods=["POST"])
 def add_meal():

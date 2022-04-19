@@ -4,3 +4,7 @@
     <input type="submit" value="Lisää ruokalaji">
 </form>
 <button onclick="location.replace('/');">Takaisin</button>
+<br>
+{% for meal in meals %}
+<p>{{ meal.name }}</p>
+{% endfor %}
