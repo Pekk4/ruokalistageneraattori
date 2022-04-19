@@ -41,3 +41,6 @@ class Service:
             return self.password_hasher.verify(user[0].password, password)
         except Exception:
             return False
+
+    def add_meal(self, meal):
+        self.repository.insert_meal(meal)

@@ -64,3 +64,8 @@ class TestService(unittest.TestCase):
         self.service.generate_menu()
 
         self.menu_repository_mock.insert_menu.assert_called_with(self.test_menu)
+
+    def test_add_meal_calls_repository_methods(self):
+        self.service.add_meal("Surströmming")
+
+        self.repository_mock.insert_meal.assert_called_with("Surströmming")

@@ -29,3 +29,9 @@ class Repository(BaseRepository):
         parameters = {"username":username}
 
         return super().read_items(query, parameters)
+
+    def insert_meal(self, meal):
+        query = "INSERT INTO meals (name) VALUES (:meal)"
+        parameters = {"meal":meal}
+
+        super().write_items(query, parameters)

@@ -78,3 +78,12 @@ class TestRepository(unittest.TestCase):
 
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0], 666)
+
+    @patch("repositories.base_repository.BaseRepository.write_items")
+    def test_add_meal_calls_super_object_correctly(self, patched_mock):
+        query = "INSERT INTO meals (name) VALUES (:meal)"
+        parameters = {"meal":"Surströmming"}
+
+        self.repository.insert_meal(parameters["meal"])
+
+        patched_mock.assert_called_with(query, parameters)
