@@ -16,7 +16,7 @@ class TestMenuRepository(unittest.TestCase):
             DO UPDATE SET timestamp = :timestamp RETURNING id"""
         self.select_query = """
             SELECT m.id AS menu_id, m.user_id AS user_id, m.timestamp AS timestamp,
-            i.id AS meal_id, i.name AS meal_name FROM menus m LEFT JOIN menu_meals n 
+            i.id AS meal_id, i.name AS meal_name FROM menus m LEFT JOIN menu_meals n
             ON m.id = n.menu_id LEFT JOIN meals i ON n.meal_id = i.id
             WHERE m.user_id = :user_id ORDER BY n.id"""
 
