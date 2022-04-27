@@ -28,7 +28,6 @@ class TestService(unittest.TestCase):
 
         self.assertIsInstance(menu, Menu)
         self.assertEqual(len(menu.meals), 7)
-        self.assertEqual(menu.date, "0")
 
     def test_insert_new_user_calls_repository_methods(self):
         self.service.insert_new_user("Paavo", "Pesusieni")
