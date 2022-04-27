@@ -2,30 +2,27 @@ from database import database as default_db
 
 class InputOutput:
     def __init__(self, database=default_db):
-        self.connection = database
+        self.session = database.session
 
-    def read(self, query, *variables):
+    def read(self, query, *parameters):
         try:
-            rows = self.connection.session.execute(query, variables)
+            rows = self.session.execute(query, *parameters)
             results = rows.fetchall()
 
             return results
 
-        except Exception: # pylint: disable=W0706
-            raise
+        except Exception: # pylint: disable=W0703
+            return []
 
-    def write(self, query, items):
+    def write(self, query, *parameters):
         try:
-            self.connection.session.execute(query, items)
-            self.connection.commit()
+            return_value = self.session.execute(query, *parameters)
+            self.session.commit()
 
-        except Exception: # pylint: disable=W0706
-            raise
+            if "RETURNING" in query:
+                return return_value.fetchone()
 
-    def run_database_command(self, query):
-        try:
-            self.connection.session.execute(query)
-            self.connection.commit()
+            return None
 
-        except Exception: # pylint: disable=W0706
-            raise
+        except Exception: # pylint: disable=W0703
+            return False

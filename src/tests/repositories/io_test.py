@@ -22,18 +22,19 @@ class TestRepository(unittest.TestCase):
     def _configure_mocks(self):
         self.db_session_mock.execute.return_value = self.return_on_select_mock
         self.return_on_select_mock.fetchall.return_value = self.test_results
+        self.return_on_select_mock.fetchone.return_value = self.test_results
         self.database_mock.attach_mock(self.db_session_mock, "session")
 
     def test_read_calls_database_methods_without_variables(self):
         self.input_output.read(self.select_query)
 
-        self.db_session_mock.execute.assert_called_with(self.select_query, ())
+        self.db_session_mock.execute.assert_called_with(self.select_query)
         self.return_on_select_mock.fetchall.assert_called()
 
     def test_read_calls_database_methods_correctly_with_variables(self):
         self.input_output.read(self.select_query, self.variables)
 
-        self.db_session_mock.execute.assert_called_with(self.select_query, (self.variables,))
+        self.db_session_mock.execute.assert_called_with(self.select_query, self.variables)
         self.return_on_select_mock.fetchall.assert_called()
 
     def test_read_returns_correct_objects_without_variables(self):
@@ -53,35 +54,27 @@ class TestRepository(unittest.TestCase):
     def test_read_on_exception(self):
         self.db_session_mock.execute.side_effect = self.exception
 
-        with self.assertRaises(Exception) as error:
-            self.input_output.read(self.select_query)
-
-        self.assertEqual(str(error.exception), "Vituixmän")
+        self.assertIsInstance(self.input_output.read("Vituixmän"), list)
 
     def test_write_calls_database_methods(self):
         self.input_output.write(self.insert_query, self.variables)
 
         self.db_session_mock.execute.assert_called_with(self.insert_query, self.variables)
-        self.database_mock.commit.assert_called()
+        self.db_session_mock.commit.assert_called()
 
     def test_write_on_exception(self):
         self.db_session_mock.execute.side_effect = self.exception
 
-        with self.assertRaises(Exception) as error:
-            self.input_output.write(self.insert_query, self.variables)
+        self.assertFalse(self.input_output.write("Vituixmän"))
 
-        self.assertEqual(str(error.exception), "Vituixmän")
+    def test_write_returns_correct_when_has_returning_command(self):
+        query = "INSERT INTO nönnönöö (nönnön, nöö) VALUES (1, 2) RETURNING id"
 
-    def test_run_database_command_calls_database_methods(self):
-        self.input_output.run_database_command(self.select_query)
+        results = self.input_output.write(query)
 
-        self.db_session_mock.execute.assert_called_with(self.select_query)
-        self.database_mock.commit.assert_called()
+        self.assertEqual(len(results), 2)
+        self.assertIsInstance(results[0], Mock)
+        self.assertEqual(str(results[0]), str(self.test_results[0]))
 
-    def test_run_database_command_on_exception(self):
-        self.db_session_mock.execute.side_effect = self.exception
-
-        with self.assertRaises(Exception) as error:
-            self.input_output.run_database_command(self.select_query)
-
-        self.assertEqual(str(error.exception), "Vituixmän")
+    def test_write_returns_none_when_no_returning_command(self):
+        self.assertIsNone(self.input_output.write(self.insert_query))
