@@ -1,38 +1,63 @@
-from database import database as default_db
-from repositories.base_repository import BaseRepository
 from entities.meal import Meal
 from entities.menu import Menu
+from repositories.io import InputOutput as default_io
 
 
-class MenuRepository(BaseRepository):
+class MenuRepository():
+    def __init__(self, database_io=default_io()):
+        self.db_io = database_io
 
-    def __init__(self, database=default_db):
-        super().__init__(database)
+    def upsert_menu(self, menu, user_id):
+        query = """
+            INSERT INTO menus (user_id, timestamp) VALUES (:user_id, :timestamp)
+            ON CONFLICT (user_id, DATE_PART('week', timestamp), DATE_PART('year', timestamp))
+            DO UPDATE SET timestamp = :timestamp RETURNING id"""
+        parameters = {"user_id": user_id, "timestamp": menu.timestamp}
 
-    def insert_menu(self, menu):
-        query = "INSERT INTO menus (meal_ids, user_id, date) VALUES (:meal_ids, :user_id, :date)"
-        meal_ids = [meal.id for meal in menu.meals]
-        parameters = {"meal_ids":meal_ids, "user_id":1, "date":menu.date}
+        menu_id = self.db_io.write(query, parameters)[0]
 
-        super().write_items(query, parameters)
+        self._insert_menu_meals(menu_id, menu.meals)
 
-    def fetch_menu(self):
-        query = "SELECT b.id, (SELECT ARRAY(SELECT CONCAT(m.id, ';', m.name) FROM meals m " \
-                "JOIN UNNEST((SELECT a.meal_ids FROM menus a WHERE a.id = b.id)) WITH " \
-                "ORDINALITY o(id, ord) USING (id) ORDER BY o.ord) AS meals), " \
-                "b.user_id, b.date FROM menus b"
+    def _insert_menu_meals(self, menu_id, meals):
+        delete_query = "DELETE FROM menu_meals WHERE menu_id = :menu_id"
 
-        results = super().read_items(query)
+        self.db_io.write(delete_query, {"menu_id": menu_id})
 
-        if not results:
-            return False # Temp
+        for meal in meals:
+            query = "INSERT INTO menu_meals (menu_id, meal_id) VALUES (:menu_id, :meal_id)"
+            parameters = {"menu_id": menu_id, "meal_id": meal.id}
 
-        results = results[-1] # Vain viimeinen lista 4 POCcing
-        meals = []
+            self.db_io.write(query, parameters)
 
-        for meal in results.meals:
-            id, name = meal.split(";")
+        # Not the most efficient solution, should be improved later.
 
-            meals.append(Meal(name, id))
+    def fetch_menu(self, user_id):
+        # user_id not used anywhere yet?
+        query = """
+            SELECT m.id AS menu_id, m.user_id AS user_id, m.timestamp AS timestamp,
+            i.id AS meal_id, i.name AS meal_name FROM menus m LEFT JOIN menu_meals n
+            ON m.id = n.menu_id LEFT JOIN meals i ON n.meal_id = i.id
+            WHERE m.user_id = :user_id ORDER BY n.id"""
+        parameters = {"user_id": user_id}
 
-        return Menu(meals, results.date, results.id)
+        results = self.db_io.read(query, parameters)
+
+        if len(results) < 1:
+            return results
+
+        meals = [Meal(result.meal_name, result.meal_id) for result in results]
+
+        if len(meals) < 7:
+            return []
+
+        return Menu(meals, results[0].timestamp, results[0].menu_id)
+
+    """
+    def update_meals_example(self, old_menu, new_menu, user_id):
+        for old_meal, new_meal in zip(old_menu.meals, new_menu.meals):
+            query = \"""UPDATE menu_meals SET meal_id = :new_meal_id
+                WHERE menu_id = :menu_id AND meal_id = :old_meal_id RETURNING id\"""
+            parameters = {"menu_id":menu_id, "new_meal_id":new_meal.id, "old_meal_id":old_meal.id}
+
+            self.db_io.write(query, parameters)
+    """
