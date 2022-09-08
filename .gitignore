@@ -10,3 +10,4 @@ htmlcov
 .coverage
 *.swp
 test.py
+logs/*
