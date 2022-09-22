@@ -1,5 +1,4 @@
-import unittest, os
-from os import mkdir, rmdir
+import unittest
 from unittest.mock import MagicMock, Mock
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -7,15 +6,6 @@ from repositories.io import InputOutput
 
 
 class TestRepository(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        mkdir("./test_logs")
-
-    @classmethod
-    def tearDownClass(cls):
-        os.remove("./test_logs/db_errors.log")
-        rmdir("./test_logs")
-
     def setUp(self):
         self.database_mock = Mock()
         self.db_session_mock = MagicMock()
@@ -100,8 +90,8 @@ class TestRepository(unittest.TestCase):
         self.assertIsInstance(results[0], Mock)
         self.assertEqual(str(results[0]), str(self.test_results[0]))
 
-    def test_write_returns_none_without_returning_command_in_query(self):
-        self.assertIsNone(self.input_output.write(self.insert_query_1))
+    def test_write_returns_correct_without_returning_command_in_query(self):
+        self.assertTrue(self.input_output.write(self.insert_query_1))
 
     def test_write_returns_correctly_on_exception(self):
         self.db_session_mock.commit.side_effect = SQLAlchemyError

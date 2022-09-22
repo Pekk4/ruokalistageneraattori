@@ -32,7 +32,7 @@ class InputOutput:
             if "RETURNING" in query:
                 return return_value.fetchone()
 
-            return None
+            return True
 
         except SQLAlchemyError as error: # sama juttu
             self.logger.error(error)
