@@ -25,3 +25,10 @@
  - S-kaupat osaa korjata urlin mikäli laittaa pelkän EAN-koodin perään, Mealeille EAN-tagi?
 
  - 
+
+ - Virheiden käsittely:
+   - Ohjelma tarkistaisi käynnistyessään tietokannan tilan ja taulut?
+    - IO:lle korkeintaan joku tilan tarkistus?
+    - Lokitus käyttöön, jonne infot ja errorit?
+
+    - Laitetaan serviceen loggerin kutsuminen ja conffien luku
