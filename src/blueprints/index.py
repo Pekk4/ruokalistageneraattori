@@ -30,8 +30,6 @@ def meals():
 
 @index_blueprint.route("/add_meal", methods=["POST"])
 def add_meal():
-    meal = request.form["meal"]
-
-    serv.add_meal(meal)
+    serv.add_meal(request.form.to_dict())
 
     return redirect("/meals")
