@@ -12,3 +12,6 @@ CREATE UNIQUE INDEX test ON menus (user_id, DATE_PART('week', timestamp), DATE_P
 --INSERT INTO menus (user_id, timestamp) VALUES (1, now()) ON CONFLICT (user_id, DATE_PART('week', timestamp), DATE_PART('year', timestamp)) DO UPDATE SET timestamp = '2022-04-19 16:30:30.416533';
 
 --menu_meals:ille indexi poistoa varten?
+
+CREATE TABLE ingredients (id SERIAL PRIMARY KEY, name TEXT);
+CREATE TABLE meal_ingredients (id SERIAL PRIMARY KEY, meal_id INTEGER REFERENCES meals, ingredient_id INTEGER REFERENCES ingredients);
