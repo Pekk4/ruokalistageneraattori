@@ -13,7 +13,8 @@
           <div id="header" class='m-20'>
             <h1 class="text-center text-5xl font-bold">Tervetuloa!</h1>
           </div>
-          <div><h1 class="text-center text-xl font-bold">Ruokalista:</h1></div>
+          
+          <div><h1 class="text-center text-xl font-bold">Viikon {{ meals.timestamp.isocalendar()[1] }} ruokalista:</h1></div>
           <div id="content-wrapper" class="m-20 grid grid-cols-7 gap-x-2 text-center">
             
             {% for meal in meals.meals %}
