@@ -1,5 +1,6 @@
-from dotenv import load_dotenv
 from os import getenv, path, mkdir
+from dotenv import load_dotenv
+
 
 dirname = path.dirname(__file__)
 envfile_path = path.join(dirname, "..", ".env")

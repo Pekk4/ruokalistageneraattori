@@ -19,8 +19,8 @@ class MenuRepository():
 
         if not menu_id:
             raise InsertingError("menu")
-        else:
-            menu_id = menu_id[0]
+
+        menu_id = menu_id[0]
 
         self._insert_menu_meals(menu_id, menu.meals)
 

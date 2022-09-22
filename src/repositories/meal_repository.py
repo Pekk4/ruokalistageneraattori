@@ -25,8 +25,8 @@ class MealRepository():
 
         if not database_id:
             raise InsertingError("meal")
-        else:
-            database_id, = database_id
+
+        database_id, = database_id
 
         return database_id
 
