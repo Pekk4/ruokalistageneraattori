@@ -1,17 +1,11 @@
-CREATE TABLE meals (id SERIAL PRIMARY KEY, name TEXT);
-CREATE TABLE users (id SERIAL PRIMARY KEY, username UNIQUE TEXT, password TEXT);
---CREATE TABLE menus (id SERIAL PRIMARY KEY, meal_ids INTEGER REFERENCES meals, user_id INTEGER REFERENCES users, date DATE);
---CREATE TABLE menus (id SERIAL PRIMARY KEY, meal_ids INTEGER[], user_id INTEGER, date DATETIME);
---CREATE TABLE menus (id SERIAL PRIMARY KEY, meal_ids INTEGER[], user_id INTEGER, TIMESTAMP TIMESTAMP);
-CREATE TABLE menus (id SERIAL PRIMARY KEY, user_id INTEGER, timestamp TIMESTAMP, week_number, INTEGER);
-create table menu_meals (id SERIAL PRIMARY KEY, menu_id INTEGER REFERENCES menus, meal_id INTEGER REFERENCES meals);
+CREATE TABLE users (id SERIAL PRIMARY KEY, username TEXT UNIQUE NOT NULL, password TEXT NOT NULL);
 
-CREATE TABLE menus (id SERIAL PRIMARY KEY, user_id INTEGER, timestamp TIMESTAMP);
-CREATE UNIQUE INDEX test ON menus (user_id, DATE_PART('week', timestamp), DATE_PART('year', timestamp));
+CREATE TABLE meals (id SERIAL PRIMARY KEY, name TEXT, user_id INTEGER REFERENCES users);
+CREATE TABLE ingredients (id SERIAL PRIMARY KEY, name TEXT, user_id INTEGER REFERENCES users);
+CREATE TABLE menus (id SERIAL PRIMARY KEY, user_id INTEGER REFERENCES users, timestamp TIMESTAMP);
 
---INSERT INTO menus (user_id, timestamp) VALUES (1, now()) ON CONFLICT (user_id, DATE_PART('week', timestamp), DATE_PART('year', timestamp)) DO UPDATE SET timestamp = '2022-04-19 16:30:30.416533';
+CREATE TABLE menu_meals (menu_id INTEGER REFERENCES menus, meal_id INTEGER REFERENCES meals);
+CREATE TABLE meal_ingredients (meal_id INTEGER REFERENCES meals, ingredient_id INTEGER REFERENCES ingredients);
 
---menu_meals:ille indexi poistoa varten?
-
-CREATE TABLE ingredients (id SERIAL PRIMARY KEY, name TEXT);
-CREATE TABLE meal_ingredients (id SERIAL PRIMARY KEY, meal_id INTEGER REFERENCES meals, ingredient_id INTEGER REFERENCES ingredients);
+CREATE UNIQUE INDEX unique_menus_per_week ON menus (user_id, DATE_PART('week', timestamp), DATE_PART('year', timestamp));
+CREATE UNIQUE INDEX unique_ingredients_for_user ON ingredients (name, user_id);
