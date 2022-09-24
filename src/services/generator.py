@@ -3,13 +3,14 @@ from datetime import datetime
 from entities.menu import Menu
 from entities.errors import NotEnoughMealsError
 
+
 class GeneratorService:
     def __init__(self, repository):
         self.repository = repository
 
-    def generate(self):
-        source = self.repository.find_all_meals()
+    def generate(self, user_id):
         generated_menu = []
+        source = self.repository.find_all_meals(user_id)
 
         if len(source) < 7:
             raise NotEnoughMealsError("Not enough meals in the database")
