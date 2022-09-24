@@ -2,8 +2,8 @@ from flask import Flask
 from config import DATABASE_URL, SECRET_KEY
 from database import database
 from blueprints.index import index_blueprint
-from blueprints.login import login_blueprint
-from blueprints.register import register_blueprint
+from blueprints.users import users_blueprint
+
 
 def create_app():
     app = Flask(__name__)
@@ -16,8 +16,7 @@ def create_app():
     database.init_app(app)
 
     app.register_blueprint(index_blueprint)
-    app.register_blueprint(login_blueprint)
-    app.register_blueprint(register_blueprint)
+    app.register_blueprint(users_blueprint)
 
     return app
 
