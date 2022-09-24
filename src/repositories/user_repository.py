@@ -8,7 +8,7 @@ class UserRepository():
         self.db_io = database_io
 
     def find_single_user(self, username):
-        query = "SELECT username, password FROM users WHERE username=:username"
+        query = "SELECT id, username, password FROM users WHERE username = :username"
         parameters = {"username":username}
 
         return self.db_io.read(query, parameters)

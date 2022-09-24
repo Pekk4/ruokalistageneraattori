@@ -8,7 +8,7 @@ from entities.errors import InsertingError
 class TestUserRepository(unittest.TestCase):
     def setUp(self):
         self.repository = UserRepository()
-        self.select_query = "SELECT username, password FROM users WHERE username=:username"
+        self.select_query = "SELECT id, username, password FROM users WHERE username = :username"
         self.insert_query = "INSERT INTO users (username, password) VALUES (:username, :password)"
         self.parameters = {"username":"Matti", "password":"Meikäläinen_666"}
 
