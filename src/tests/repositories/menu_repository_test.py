@@ -23,7 +23,7 @@ class TestMenuRepository(unittest.TestCase):
             i.id AS meal_id, i.name AS meal_name FROM menus m LEFT JOIN menu_meals n
             ON m.id = n.menu_id LEFT JOIN meals i ON n.meal_id = i.id
             WHERE m.user_id = :user_id AND DATE_PART('week', timestamp) =
-            DATE_PART('week', NOW()) ORDER BY n.id"""
+            DATE_PART('week', NOW())"""
 
         meals = [Meal("Surströmming", i) for i in range(7)]
 

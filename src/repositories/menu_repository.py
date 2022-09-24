@@ -35,13 +35,12 @@ class MenuRepository():
         # Not the most efficient solution, should be improved later.
 
     def fetch_menu(self, user_id):
-        # user_id not used anywhere yet?
         query = """
             SELECT m.id AS menu_id, m.user_id AS user_id, m.timestamp AS timestamp,
             i.id AS meal_id, i.name AS meal_name FROM menus m LEFT JOIN menu_meals n
             ON m.id = n.menu_id LEFT JOIN meals i ON n.meal_id = i.id
             WHERE m.user_id = :user_id AND DATE_PART('week', timestamp) =
-            DATE_PART('week', NOW()) ORDER BY n.id"""
+            DATE_PART('week', NOW())"""
         parameters = {"user_id": user_id}
 
         results = self.db_io.read(query, parameters)
@@ -52,13 +51,3 @@ class MenuRepository():
         meals = [Meal(result.meal_name, result.meal_id) for result in results]
 
         return Menu(meals, results[0].timestamp, results[0].menu_id)
-
-    """
-    def update_meals_example(self, old_menu, new_menu, user_id):
-        for old_meal, new_meal in zip(old_menu.meals, new_menu.meals):
-            query = \"""UPDATE menu_meals SET meal_id = :new_meal_id
-                WHERE menu_id = :menu_id AND meal_id = :old_meal_id RETURNING id\"""
-            parameters = {"menu_id":menu_id, "new_meal_id":new_meal.id, "old_meal_id":old_meal.id}
-
-            self.db_io.write(query, parameters)
-    """
