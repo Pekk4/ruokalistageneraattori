@@ -7,29 +7,30 @@ serv = Service()
 
 @index_blueprint.route("/")
 def index():
-    meals = serv.fetch_menu()
+    if "uid" in session:
+        meals = serv.fetch_menu(session["uid"])
+    else:
+        meals = []
 
     return render_template("index.html", meals=meals)
 
-@index_blueprint.route("/logout")
-def logout():
-    del session["username"]
-    return redirect("/")
-
 @index_blueprint.route("/generate")
 def generate():
-    serv.generate_menu()
+    if "uid" in session:
+        serv.generate_menu(session["uid"])
 
     return redirect("/")
 
 @index_blueprint.route("/meals")
 def meals():
-    meals = serv.fetch_meals()
+    if "uid" in session:
+        meals = serv.fetch_users_meals(session["uid"])
 
     return render_template("add_meal.html", meals=meals)
 
 @index_blueprint.route("/add_meal", methods=["POST"])
 def add_meal():
-    serv.add_meal(request.form.to_dict())
+    if "uid" in session:
+        serv.add_meal(request.form.to_dict(), session["uid"])
 
     return redirect("/meals")
