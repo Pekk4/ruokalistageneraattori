@@ -7,8 +7,11 @@ class MealRepository():
     def __init__(self, database_io=default_io()):
         self.db_io = database_io
 
-    def find_all_meals(self):
-        results = self.db_io.read("SELECT name, id FROM meals")
+    def find_all_meals(self, user_id):
+        query = "SELECT id, name FROM meals WHERE user_id = :user_id"
+        parameters = {"user_id":user_id}
+
+        results = self.db_io.read(query, parameters)
 
         if len(results) == 0:
             return results
@@ -17,9 +20,9 @@ class MealRepository():
 
         return meals
 
-    def insert_meal(self, meal):
-        query = "INSERT INTO meals (name) VALUES (:meal) RETURNING id"
-        parameters = {"meal":meal}
+    def insert_meal(self, meal, user_id):
+        query = "INSERT INTO meals (name, user_id) VALUES (:meal, :user_id) RETURNING id"
+        parameters = {"meal":meal, "user_id":user_id}
 
         database_id = self.db_io.write(query, parameters)
 
@@ -30,9 +33,9 @@ class MealRepository():
 
         return database_id
 
-    def insert_ingredients(self, ingredients):
-        query = "INSERT INTO ingredients (name) VALUES (:ingredient) RETURNING id"
-        parameters = [{"ingredient":ingredient} for ingredient in ingredients]
+    def insert_ingredients(self, ingredients, user_id):
+        query = "INSERT INTO ingredients (name, user_id) VALUES (:ingredient, :user_id) RETURNING id"
+        parameters = [{"ingredient":ingredient, "user_id":user_id} for ingredient in ingredients]
 
         database_ids = self.db_io.write_many(query, parameters)
 
@@ -42,9 +45,7 @@ class MealRepository():
         return database_ids
 
     def insert_meal_ingredients(self, meal_id, ingredient_ids):
-        query = """
-            INSERT INTO meal_ingredients (meal_id, ingredient_id)
-            VALUES (:meal_id, :ingredient_id)"""
+        query = "INSERT INTO meal_ingredients (meal_id, ingredient_id) VALUES (:meal_id, :ingredient_id)"
         parameters = [{"meal_id":meal_id, "ingredient_id":db_id} for db_id, in ingredient_ids]
 
         return_value = self.db_io.write_many(query, parameters)
