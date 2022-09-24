@@ -1,4 +1,4 @@
-from argon2 import PasswordHasher
+from argon2 import PasswordHasher, exceptions
 
 from services.generator import GeneratorService
 from repositories.menu_repository import MenuRepository as default_menu_repository
@@ -22,15 +22,15 @@ class Service:
         self.password_hasher = PasswordHasher()
         self.generator = generator or GeneratorService(self.meal_repository)
 
-    def fetch_menu(self):
-        meals = self.menu_repository.fetch_menu(1) # HUOM! user-id
+    def fetch_menu(self, user_id):
+        menu = self.menu_repository.fetch_menu(user_id)
 
-        return meals
+        return menu
 
-    def generate_menu(self):
-        menu = self.generator.generate()
+    def generate_menu(self, user_id):
+        menu = self.generator.generate(user_id)
 
-        self.menu_repository.upsert_menu(menu, 1) # HUOM! user-id
+        self.menu_repository.upsert_menu(menu, user_id)
 
         ### TRY CATCH tännekin
 
@@ -42,18 +42,23 @@ class Service:
     def login_user(self, username, password):
         user = self.user_repository.find_single_user(username)
 
-        try:
-            return self.password_hasher.verify(user[0].password, password)
-        except Exception: # ???
+        if not user:
             return False
 
-    def add_meal(self, inputs_dict):
+        try:
+            self.password_hasher.verify(user[0].password, password)
+        except exceptions.VerifyMismatchError:
+            return False
+        else:
+            return (user[0].username, user[0].id)
+
+    def add_meal(self, inputs_dict, user_id):
         meal = inputs_dict.pop("meal")
         ingredients = list(inputs_dict.values())
 
         try:
-            meal_id = self.meal_repository.insert_meal(meal)
-            ingredient_ids = self.meal_repository.insert_ingredients(ingredients)
+            meal_id = self.meal_repository.insert_meal(meal, user_id)
+            ingredient_ids = self.meal_repository.insert_ingredients(ingredients, user_id)
             self.meal_repository.insert_meal_ingredients(meal_id, ingredient_ids)
 
         except InsertingError as error: # tähän jotain järkeä
@@ -61,7 +66,7 @@ class Service:
 
         return True # Necessary?
 
-    def fetch_meals(self):
-        meals = self.meal_repository.find_all_meals()
+    def fetch_users_meals(self, user_id):
+        meals = self.meal_repository.find_all_meals(user_id)
 
         return meals
