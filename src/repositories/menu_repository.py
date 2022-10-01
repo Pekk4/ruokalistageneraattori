@@ -26,8 +26,8 @@ class MenuRepository():
 
     def _insert_menu_meals(self, menu_id, meals):
         delete_query = "DELETE FROM menu_meals WHERE menu_id = :menu_id"
-        insert_query = "INSERT INTO menu_meals (menu_id, meal_id) VALUES (:menu_id, :meal_id)"
-        meals = [{"menu_id":menu_id, "meal_id":meal.id} for meal in meals]
+        insert_query = "INSERT INTO menu_meals (menu_id, meal_id, day_of_week) VALUES (:menu_id, :meal_id, :day)"
+        meals = [{"menu_id":menu_id, "meal_id":meal.id, "day":meals.index(meal)} for meal in meals]
 
         self.db_io.write(delete_query, {"menu_id": menu_id})
         self.db_io.write_many(insert_query, meals)
@@ -40,7 +40,7 @@ class MenuRepository():
             i.id AS meal_id, i.name AS meal_name FROM menus m LEFT JOIN menu_meals n
             ON m.id = n.menu_id LEFT JOIN meals i ON n.meal_id = i.id
             WHERE m.user_id = :user_id AND DATE_PART('week', timestamp) =
-            DATE_PART('week', NOW())"""
+            DATE_PART('week', NOW()) ORDER BY n.day_of_week"""
         parameters = {"user_id": user_id}
 
         results = self.db_io.read(query, parameters)
@@ -51,3 +51,12 @@ class MenuRepository():
         meals = [Meal(result.meal_name, result.meal_id) for result in results]
 
         return Menu(meals, results[0].timestamp, results[0].menu_id)
+
+    def replace_menu_meal(self, user_id, new_id, day_of_week):
+        query = """
+            UPDATE menu_meals SET meal_id = :new_id WHERE menu_id = (SELECT id FROM menus WHERE
+            user_id = :user_id AND DATE_PART('week', timestamp) = DATE_PART('week', NOW())) AND
+            day_of_week = :day"""
+        parameters = {"user_id":user_id, "new_id":new_id, "day":day_of_week}
+
+        return self.db_io.write(query, parameters)

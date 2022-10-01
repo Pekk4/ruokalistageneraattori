@@ -23,13 +23,13 @@ class TestMenuRepository(unittest.TestCase):
             i.id AS meal_id, i.name AS meal_name FROM menus m LEFT JOIN menu_meals n
             ON m.id = n.menu_id LEFT JOIN meals i ON n.meal_id = i.id
             WHERE m.user_id = :user_id AND DATE_PART('week', timestamp) =
-            DATE_PART('week', NOW())"""
+            DATE_PART('week', NOW()) ORDER BY n.day_of_week"""
 
-        meals = [Meal("Surströmming", i) for i in range(7)]
+        meals = [Meal("Surströmming"+f"{i}", i) for i in range(7)]
 
         self.date = datetime.now()
         self.menu = Menu(meals, self.date)
-        self.return_value = [RowMock("Surströmming", i, self.date, 1) for i in range(7)]
+        self.return_value = [RowMock("Surströmming"+f"{i}", i, self.date, 1) for i in range(7)]
 
         self.io_mock.read.return_value = self.return_value
 
@@ -62,8 +62,8 @@ class TestMenuRepository(unittest.TestCase):
 
     def test_upsert_menu_calls_submethod_correct(self):
         delete_query = "DELETE FROM menu_meals WHERE menu_id = :menu_id"
-        insert_query = "INSERT INTO menu_meals (menu_id, meal_id) VALUES (:menu_id, :meal_id)"
-        meals = [{"menu_id":666, "meal_id":meal.id} for meal in self.menu.meals]
+        insert_query = "INSERT INTO menu_meals (menu_id, meal_id, day_of_week) VALUES (:menu_id, :meal_id, :day)"
+        meals = [{"menu_id":666, "meal_id":meal.id, "day":meal.id} for meal in self.menu.meals]
 
         self.io_mock.write.return_value = (666,)
 
@@ -124,6 +124,31 @@ class TestMenuRepository(unittest.TestCase):
 
         self.assertEqual(fetched_menu.meals[0].id, self.return_value[0].meal_id)
         self.assertEqual(fetched_menu.meals[0].name, self.return_value[0].meal_name)
+
+    def test_replace_menu_meal_calls_write_method_correct(self):
+        query = """
+            UPDATE menu_meals SET meal_id = :new_id WHERE menu_id = (SELECT id FROM menus WHERE
+            user_id = :user_id AND DATE_PART('week', timestamp) = DATE_PART('week', NOW())) AND
+            day_of_week = :day"""
+        parameters = {"user_id":1, "new_id":1, "day":1}
+
+        self.repository.replace_menu_meal(1, 1, 1)
+
+        self.io_mock.write.assert_called_with(query, parameters)
+
+    def test_replace_menu_meals_does_not_call_write_method_incorrect(self):
+        false_query = """
+            UPDATE menu_meals SET meal_id = :new_id WHERE menu_id = (SELECT id FROM menus WHERE
+            user_id = :user_id AND DATE_PART('week', timestamp) = DATE_PART('week', NOW()))"""
+
+        self.repository.replace_menu_meal(666, 666, 666)
+
+        self.assertFalse(false_query in self.io_mock.write.call_args.args)
+
+    def test_replace_menu_returns_correct(self):
+        self.io_mock.write.return_value = True
+
+        self.assertTrue(self.repository.replace_menu_meal(666, 13, 7))
 
 
 class RowMock():
