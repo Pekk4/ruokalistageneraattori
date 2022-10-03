@@ -5,6 +5,7 @@ from repositories.menu_repository import MenuRepository as default_menu_reposito
 from repositories.meal_repository import MealRepository as default_meal_repository
 from repositories.user_repository import UserRepository as default_user_repository
 from entities.errors import InsertingError
+from utilities import DAYS
 
 
 class Service:
@@ -28,7 +29,7 @@ class Service:
         return menu
 
     def generate_menu(self, user_id):
-        menu = self.generator.generate(user_id)
+        menu = self.generator.generate_menu(user_id)
 
         self.menu_repository.upsert_menu(menu, user_id)
 
@@ -70,3 +71,15 @@ class Service:
         meals = self.meal_repository.find_all_meals(user_id)
 
         return meals
+
+    def generate_meal(self, user_id):
+        menu = self.fetch_menu(user_id)
+        meal = self.generator.generate_meal(user_id, menu)
+
+        return meal
+
+    def replace_meal(self, user_id, form_data):
+        (day, meal_id) = form_data
+        day_number = DAYS[day]
+
+        self.menu_repository.replace_menu_meal(user_id, meal_id, day_number)

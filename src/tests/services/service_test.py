@@ -66,10 +66,10 @@ class TestService(unittest.TestCase):
     def test_generate_menu_calls_generator_methods(self):
         self.service.generate_menu(1)
 
-        self.generator_mock.generate.assert_called_with(1)
+        self.generator_mock.generate_menu.assert_called_with(1)
 
     def test_generate_menu_calls_repository_methods(self):
-        self.generator_mock.generate.return_value = self.test_menu
+        self.generator_mock.generate_menu.return_value = self.test_menu
         self.service.generate_menu(1)
 
         self.menu_repository_mock.upsert_menu.assert_called_with(self.test_menu, 1)
