@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Tervetuloa</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="static/css/style.css" rel="stylesheet">
+        <script>
+            let userMeals;
+            let saveMealSuccess;
+
+            function fetchMeals() {
+                const xhttp = new XMLHttpRequest();
+
+                xhttp.onload = function() {
+                    userMeals = new Map(Object.entries(JSON.parse(this.response)));
+                }
+                xhttp.open("GET", "/get_meals", true);
+                xhttp.send();
+            }
+
+            function replaceMeal(form, day) {
+                const formData = new FormData(form);
+                const mealData = formData.get(day).split(":");
+                const confirmStr = "Vaihdetaanko " +day.toLowerCase()+ "n ruokalajiksi " +mealData[1]+ "?";
+
+                const answerValue = confirm(confirmStr);
+
+                if (answerValue === true) {
+                    saveMeal(day, mealData[0]);
+                    checkMealIsSaved();
+                    setMeal(day, mealData[1]);
+                }
+            }
+
+            function generateMeal(day) {
+                const xhttp = new XMLHttpRequest();
+                
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        const meal = JSON.parse(this.response);
+                        const confirmStr = "Vaihdetaanko " + day.toLowerCase() + "n ruokalajiksi " + meal.meal + "?";
+                        const confirmValue = confirm(confirmStr);
+
+                        if (confirmValue === true) {
+                            saveMeal(day, meal.id);
+                            checkMealIsSaved();
+                            setMeal(day, meal.meal);
+                        }
+                    }
+                }
+                xhttp.open("GET", "/generate_meal", true);
+                xhttp.send();
+            }
+
+            function saveMeal(day, meal_id) {
+                const xhttp = new XMLHttpRequest();
+                const formData = new FormData();
+
+                formData.append(day, meal_id);
+                formData.append("csrf_token", document.getElementById("csrf_token").value);
+
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        saveMealSuccess = true;
+                    } else {
+                        saveMealSuccess = false;
+                    }
+                }
+                xhttp.open("POST", "/replace_meal");
+                xhttp.send(formData);
+
+            }
+
+            function checkMealIsSaved() {
+                setTimeout(() => {
+                    if (saveMealSuccess === true) {
+                        saveMealSuccess = false;
+                    } else {
+                        alert("Vaihto ei tallentunut tietokantaan, yritä myöhemmin uudelleen.");
+                    }
+                }, 1000);
+            }
+
+            function setMeal(day, meal) {
+                const mealDiv = document.getElementById("meal-name-"+day);
+
+                mealDiv.innerHTML = meal;
+
+                tearDownReplaceMenu(day);
+            }
+
+            function tearDownReplaceMenu(day) {
+                const formDiv = document.getElementById("form-div-"+day);
+
+                document.getElementById(day).style = "display: none";
+
+                swapButtons(false, day);
+                formDiv.removeChild(formDiv.firstChild);
+                formDiv.removeChild(formDiv.lastChild);
+                formDiv.removeChild(formDiv.lastChild);
+            }
+
+            function swapButtons(flag, day) {
+                const submitButton = document.createElement("input");
+                const replaceButton = document.createElement("button");
+                const buttonDiv = document.getElementById("button-div-"+day);
+
+                submitButton.type = "submit";
+                submitButton.value = "Vaihda ruokalaji";
+                replaceButton.type = "button";
+                replaceButton.innerHTML = "Vaihda";
+                replaceButton.onclick = () => {
+                    startLoop(day);
+                }
+
+                if (flag === true) {
+                    buttonDiv.replaceChild(submitButton, buttonDiv.firstChild);
+                } else {
+                    buttonDiv.replaceChild(replaceButton, buttonDiv.firstChild);
+                }
+            }
+
+            function buildReplaceMealForm(day) {
+                const mealForm = document.getElementById("replace-meal-form-"+day);
+                const selectElement = document.getElementById(day);
+                const formDiv = document.getElementById("form-div-"+day);
+                const paraElem = document.createElement("p");
+
+                selectElement.style = "";
+                paraElem.innerHTML = "Valitse ruokalaji:";
+
+                formDiv.insertBefore(paraElem, formDiv.firstChild);
+
+                if (selectElement.childElementCount < 1) {
+                    buildMealList(selectElement);
+
+                    mealForm.addEventListener("submit", (event) => {
+                        event.preventDefault();
+                        
+                        replaceMeal(mealForm, day);
+                    });
+                }
+
+                swapButtons(true, day);
+            }
+
+            function buildMealList(parentElement) {
+                for (const [key, value] of userMeals) {
+                    const optionElement = document.createElement("option");
+
+                    optionElement.value = key+":"+value;
+                    optionElement.text = value;
+
+                    parentElement.appendChild(optionElement);
+                }
+            }
+
+            function buildGenerateMealButton(day) {
+                const generateButton = document.createElement("button");
+                const paraElem = document.createElement("p");
+                const formDiv = document.getElementById("form-div-"+day);
+
+                generateButton.innerHTML = "Generoi ruokalaji";
+                generateButton.onclick = () => {
+                    generateMeal(day);
+                }
+                paraElem.innerHTML = "Tai";
+
+                formDiv.appendChild(paraElem);
+                formDiv.appendChild(generateButton);
+            }
+
+            function startLoop(day) {
+                buildReplaceMealForm(day);
+                buildGenerateMealButton(day);
+            }
+
+            function startEditing() {
+                fetchMeals();
+
+                for (let div of document.getElementsByClassName("form-div")) {
+                    div.style = "";
+                }
+
+                document.getElementById("activate-button").style = "display: none";
+            }
+        </script>
+    </head>
+    <body>
+      {% if session.username %}
+        <a href="/logout">Kirjaudu ulos</a>
+        <div class="container 2xl mx-auto m-14 content-center border-2 border-black">
+          <div id="header" class='m-20'>
+            <h3 class="text-center text-2xl font-bold">Muokkaa nykyistä ruokalistaa:</h1>
+          </div>          
+          <div id="content-wrapper" class="m-20 grid grid-cols-7 gap-x-2 text-center">
+            {% for menumeal,day in menumeals_days %}<div>
+                <div class="border-2 border-black ">
+                    <h1>{{ day }}:</h1>
+                    <p id="meal-name-{{ day }}">{{ menumeal }}</p>
+                </div>
+                <div id="form-div-{{ day }}" class="form-div" style="display: none;">
+                    <form id="replace-meal-form-{{ day }}">
+                        <select id="{{ day }}" name="{{ day }}" style="display: none;"></select>
+                        <div id="button-div-{{ day }}"><button id="button-{{ day }}" type="button" onclick="startLoop('{{ day }}')">Vaihda</button></div>
+                        <input id="csrf_token" type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    </form>
+                </div>
+            </div>{% endfor %}
+            <div id="activate-button"><button onclick="startEditing()">Muokkaa listaa</button></div>
+          </div>
+        </div>
+        <button onclick="location.replace('/');">Takaisin</button>
+        <button onclick="location.replace('/meals');">Lisää ruokalajeja</button>
+        <button onclick="location.replace('/generate');">Generoi uusi lista</button>
+
+        <br><br>
+        <div style="border: 1px solid black;">
+            <p>Aiemmat ruokalistat:</p>{% for menu in menus %}
+            <p>{{ menu }}</p>{% endfor %}
+        </div>
+            
+      {% else %}
+      <a href="/login_page">Kirjaudu sisään</a>
+      <p>tai</p>
+      <a href="/register_page">Rekisteröidy</a>
+      {% endif %}
+    </body>
+</html>

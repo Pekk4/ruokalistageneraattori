@@ -1,8 +1,11 @@
-from flask import redirect, render_template, Blueprint, request, session
+from flask import redirect, render_template, Blueprint, request, session, abort, jsonify
+
 from services.service import Service
+from entities.errors import NotEnoughMealsError
+from utilities import DAYS
+
 
 index_blueprint = Blueprint("index_blueprint", __name__)
-
 serv = Service()
 
 @index_blueprint.route("/")
@@ -34,3 +37,40 @@ def add_meal():
         serv.add_meal(request.form.to_dict(), session["uid"])
 
     return redirect("/meals")
+
+@index_blueprint.route("/manage")
+def manage():
+    if "uid" in session:
+        menu = serv.fetch_menu(session["uid"])
+    else:
+        menu = []
+
+    return render_template("manage.html", menumeals_days=zip(menu.meals,DAYS))
+
+@index_blueprint.route("/get_meals")
+def get_meals():
+    if "uid" in session:
+        meals = {meal.id:meal.name for meal in serv.fetch_users_meals(session["uid"])}
+
+        try:
+            mela = jsonify(meals)
+            return mela
+        except NotEnoughMealsError:
+            return ":("
+    else:
+        abort(403)
+
+@index_blueprint.route("/replace_meal", methods=["POST"])
+def replace_meal():
+    if "uid" in session:
+        form_data = list(request.form.items())
+        serv.replace_meal(session["uid"], form_data[0])
+
+        return "OK"
+
+@index_blueprint.route("/generate_meal")
+def generate_meal():
+    if "uid" in session:
+        meal = serv.generate_meal(session["uid"])
+
+        return jsonify({"meal":meal.name, "id":meal.id})
