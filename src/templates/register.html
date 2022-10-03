@@ -4,4 +4,5 @@
     <p>Salasana:<br>
     <input type="password" name="password"></p>
     <input type="submit" value="Rekisteröidy">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 </form>

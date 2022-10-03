@@ -8,5 +8,6 @@
     <p>Salasana:<br>
     <input type="password" name="password"></p>
     <input type="submit" value="Kirjaudu">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 </form>
 {% endif %}

@@ -52,6 +52,7 @@
             </div>
             <button type="button" onclick="new_field()">Lisää ainesosia</button>
             <input type="submit" value="Lisää ruokalaji">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         </form>
         <button onclick="location.replace('/')">Takaisin</button>
         <br>

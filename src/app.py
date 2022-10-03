@@ -1,4 +1,6 @@
 from flask import Flask
+from flask_wtf.csrf import CSRFProtect
+
 from config import DATABASE_URL, SECRET_KEY
 from database import database
 from blueprints.index import index_blueprint
@@ -12,6 +14,8 @@ def create_app():
     # tutki mihin nämä siivotaan tästä
     app.secret_key = SECRET_KEY
 
+    csrf = CSRFProtect()
+    csrf.init_app(app)
 
     database.init_app(app)
 
