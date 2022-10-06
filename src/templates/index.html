@@ -13,8 +13,9 @@
           <div id="header" class='m-20'>
             <h1 class="text-center text-5xl font-bold">Tervetuloa!</h1>
           </div>
-          
-          <div><h1 class="text-center text-xl font-bold">Viikon {{ meals.timestamp.isocalendar()[1] }} ruokalista:</h1></div>
+          {% if meals %}
+          <!--<div><h1 class="text-center text-xl font-bold">Viikon  meals.timestamp.isocalendar()[1]  ruokalista:</h1></div>-->
+          <div><h1 class="text-center text-xl font-bold">Viikon n ruokalista:</h1></div>
           <div id="content-wrapper" class="m-20 grid grid-cols-7 gap-x-2 text-center">
             
             {% for meal in meals.meals %}
@@ -27,10 +28,14 @@
             {% endfor %}
 
           </div>
+          {% else %}
+          <div><h1 class="text-center text-xl font-bold"><button onclick="location.replace('/generate')">Generoi ruokalista</button></h1></div>
+        {% endif %}
         </div>
         <!--<button onclick="location.reload();">Generoi ruokalista</button>-->
-        <button onclick="location.replace('/generate');">Generoi ruokalista</button>
+        <button onclick="location.replace('/manage');">Hallitse ruokalistaa</button>
         <button onclick="location.replace('/meals');">Lisää ruokalajeja</button>
+        <button onclick="location.replace('/old_menus?week=39');">Testaa</button>
       {% else %}
       <a href="/login_page">Kirjaudu sisään</a>
       <p>tai</p>
