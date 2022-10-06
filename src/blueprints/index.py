@@ -42,10 +42,11 @@ def add_meal():
 def manage():
     if "uid" in session:
         menu = serv.fetch_menu(session["uid"])
+        old_menus = serv.fetch_old_menus(session["uid"], 35)
     else:
         menu = []
 
-    return render_template("manage.html", menumeals_days=zip(menu.meals,DAYS))
+    return render_template("manage.html", menus=old_menus, menumeals_days=zip(menu.meals,DAYS))
 
 @index_blueprint.route("/get_meals")
 def get_meals():
@@ -74,3 +75,25 @@ def generate_meal():
         meal = serv.generate_meal(session["uid"])
 
         return jsonify({"meal":meal.name, "id":meal.id})
+
+@index_blueprint.route("/old_menus", methods=["GET"])
+def old_menus():
+    if request.args:
+        old_menus = serv.fetch_old_menus(session["uid"])
+        selected_menu = serv.fetch_menu_by_timestamp(session["uid"], request.args.get("week"), request.args.get("year"))
+
+        return render_template("old_menus.html", menus=old_menus, sele_days=zip(selected_menu.meals,DAYS))
+    else:
+        old_menus = serv.fetch_old_menus(session["uid"])
+
+        return render_template("old_menus.html", menus=old_menus)
+
+@index_blueprint.route("/replace_menu", methods=["GET"])
+def replace_menu():
+    if request.args:
+        status = serv.replace_current_menu_with(session["uid"], request.args.get("week"), request.args.get("year"))
+
+        if status is True:
+            return "OK"
+
+        return "NOK"

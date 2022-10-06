@@ -215,11 +215,12 @@
         <button onclick="location.replace('/meals');">Lisää ruokalajeja</button>
         <button onclick="location.replace('/generate');">Generoi uusi lista</button>
 
-        <br><br>
+        <br><br>{% if menus %}
         <div style="border: 1px solid black;">
-            <p>Aiemmat ruokalistat:</p>{% for menu in menus %}
-            <p>{{ menu }}</p>{% endfor %}
-        </div>
+            <p>Aiemmat ruokalistat:</p>{% for menu in menus %}{% set timestamp = menu.timestamp.isocalendar() %}
+            <p><a href="/old_menus?week={{ timestamp[1] }}&year={{ timestamp[0] }}">Viikko {{ timestamp[1] }} / {{ timestamp[0] }}</a></p>{% endfor %}
+            <p><a href="/old_menus">Näytä lisää...</a></p>
+        </div>{% endif %}
             
       {% else %}
       <a href="/login_page">Kirjaudu sisään</a>
