@@ -14,7 +14,7 @@ class TestService(unittest.TestCase):
 
         self.test_menu = Menu(list(range(7)), "0")
 
-        self.menu_repository_mock.fetch_menu.return_value = self.test_menu
+        self.menu_repository_mock.fetch_current_menu.return_value = self.test_menu
 
         self.service = Service(
             self.user_repository_mock,
@@ -26,7 +26,7 @@ class TestService(unittest.TestCase):
     def test_fetch_menu_calls_repository_methods(self):
         self.service.fetch_menu(1)
 
-        self.menu_repository_mock.fetch_menu.assert_called_with(1)
+        self.menu_repository_mock.fetch_current_menu.assert_called_with(1)
 
     def test_fetch_menu_returns_correct_object(self):
         menu = self.service.fetch_menu(1)

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from argon2 import PasswordHasher, exceptions
 
 from services.generator import GeneratorService
@@ -5,7 +7,8 @@ from repositories.menu_repository import MenuRepository as default_menu_reposito
 from repositories.meal_repository import MealRepository as default_meal_repository
 from repositories.user_repository import UserRepository as default_user_repository
 from entities.errors import InsertingError
-from utilities import DAYS
+from entities.menu import Menu
+from utilities import DAYS, validate_week_number, validate_year
 
 
 class Service:
@@ -24,7 +27,7 @@ class Service:
         self.generator = generator or GeneratorService(self.meal_repository)
 
     def fetch_menu(self, user_id):
-        menu = self.menu_repository.fetch_menu(user_id)
+        menu = self.menu_repository.fetch_current_menu(user_id)
 
         return menu
 
@@ -83,3 +86,33 @@ class Service:
         day_number = DAYS[day]
 
         self.menu_repository.replace_menu_meal(user_id, meal_id, day_number)
+
+    def fetch_old_menus(self, user_id: int, limit_rows: int=False):
+        menus = self.menu_repository.fetch_old_menus(user_id, limit_rows)
+
+        return menus
+
+    def fetch_menu_by_timestamp(self, user_id: int, week_number: int, year: int):
+        try:
+            week_number = int(week_number)
+            year = int(year)
+            validate_week_number(week_number)
+            validate_year(year)
+        except (TypeError, ValueError):
+            return "False week number, stop hacking :("
+        else:
+            return self.menu_repository.fetch_menu_by_year_and_week(user_id, year, week_number)
+
+    def replace_current_menu_with(self, user_id: int , week_number: int, year: int):
+        menu = self.fetch_menu_by_timestamp(user_id, week_number, year)
+
+        if isinstance(menu, Menu):
+            try:
+                menu.timestamp = datetime.now()
+                self.menu_repository.upsert_menu(menu, user_id)
+            except InsertingError as error:
+                return error
+            else:
+                return True
+        
+        return False
