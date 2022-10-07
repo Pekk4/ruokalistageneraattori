@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+ /* For width smaller than 400px: */
+ body {
+    background-image: url('../images/bg2.jpg');
+  }
+  
+  /* For width 400px and larger: */
+  @media only screen and (min-width: 400px) {
+    body {
+      background-image: url('../images/bg1.jpg');
+    }
+  } 
