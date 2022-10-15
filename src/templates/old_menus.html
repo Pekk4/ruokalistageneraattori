@@ -5,78 +5,48 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="static/css/style.css" rel="stylesheet">
+        <link href="static/css/main.css" rel="stylesheet">
         <script>
-            let menuChanged;
-
-            function replaceMeal() {
+            function replaceMenu() {
                 const queryString = window.location.search;
                 const xhttp = new XMLHttpRequest();
                 const confirmText = "Haluatko varmasti vaihtaa menun nykyiseksi?"
-                const confirmReplacement = confirm(confirmText);
 
-                xhttp.onreadystatechange = function() {
-                    if (this.readyState == 4 && this.status == 200) {
-                        menuChanged = true;
+                if (confirm(confirmText) === true) {
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            location.replace("/manage")
+                        }
                     }
-                }
-
-                if (confirmReplacement === true) {
                     xhttp.open("GET", "/replace_menu"+queryString);
                     xhttp.send();
-
-                    checkMenuIsChanged();
                 }
-            }
-
-            function checkMenuIsChanged() {
-                setTimeout(() => {
-                    if (menuChanged === true) {
-                        alert("Menu vaihdettu!");
-                    } else {
-                        alert("Menun vaihto ei onnistunut")
-                    }
-                }, 1000);
             }
         </script>
     </head>
-    <body>
-      {% if session.username %}
-        <a href="/logout">Kirjaudu ulos</a>
-        <div class="container 2xl mx-auto m-14 content-center border-2 border-black">
-          <div id="header" class='m-20'>
-            <h3 class="text-center text-2xl font-bold">Muokkaa nykyistä ruokalistaa:</h1>
-          </div>          
-          <div id="content-wrapper" class="m-20 grid grid-cols-7 gap-x-2 text-center">
-            {% for meal,day in sele_days %}<div>
-                <div class="border-2 border-black ">
-                    <h1>{{ day }}:</h1>
-                    <p id="meal-name-{{ day }}">{{ meal }}</p>
+    {% include "header.html" %}{% if session.username %}
+        <div class="{% if sele_days %}border border-black rounded bg-orange-100/90 {% endif %}m-14 grid place-items-center overflow-hidden">
+            <div class="{% if not sele_days %}hidden{% endif %} p-12">
+                <p class="text-center text-2xl font-bold">{% if timestamp %}Viikon {{ timestamp[1] }} / {{ timestamp[0] }} ruokalista:{% endif %}</p>
+            </div>
+            <div>
+                <div class="grid grid-cols-7 text-center border-b rounded-b border-t border-l border-black rounded-t">{% for day, meal in sele_days %}
+                    <div class="p-3 border-r border-black bg-orange-100 hover:bg-white {% if day == 0 %}rounded-tl rounded-bl{% elif day == 6 %}rounded-tr rounded-br{% endif %}">
+                        <p class="p-1 font-semibold">{{ days[day] }}:</p>
+                        <p class="p-1">{{ meal }}</p>
+                    </div>{% endfor %}
                 </div>
-                <div id="form-div-{{ day }}" class="form-div" style="display: none;">
-                    <form id="replace-meal-form-{{ day }}">
-                        <select id="{{ day }}" name="{{ day }}" style="display: none;"></select>
-                        <div id="button-div-{{ day }}"><button id="button-{{ day }}" type="button" onclick="startLoop('{{ day }}')">Vaihda</button></div>
-                        <input id="csrf_token" type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    </form>
-                </div>
-            </div>{% endfor %}
-          </div>
-          <button onclick="replaceMeal()">Vaihda nykyiseksi ruokalistaksi</button>
+            </div>
+            <button onclick="replaceMenu()" class="{% if not sele_days %}hidden{% endif %} m-14 bg-green-600 hover:bg-green-700 text-white font-bold px-2 py-1 border border-green-800 rounded">Vaihda nykyiseksi ruokalistaksi</button>{% if menus %}
+            <div class="{% if not sele_days %}max-h-[30rem] m-14{% else %}max-h-52 mb-14{% endif %} overflow-y-scroll bg-orange-100 border border-black rounded pb-3">
+                <p class="px-5 py-3 font-semibold">Aiemmat ruokalistat:</p>{% for menu in menus %}{% set timestamp = menu.timestamp.isocalendar() %}
+                <p class="px-5 hover:font-semibold"><a href="/old_menus?week={{ timestamp[1] }}&year={{ timestamp[0] }}">Viikko {{ timestamp[1] }} / {{ timestamp[0] }}</a></p>{% endfor %}
+            </div>{% endif %}
         </div>
-        <button onclick="location.replace('/manage');">Takaisin</button>
-        <button onclick="location.replace('/meals');">Lisää ruokalajeja</button>
-        <button onclick="location.replace('/generate');">Generoi uusi lista</button>
-
-        <br><br>{% if menus %}
-        <div style="border: 1px solid black;">
-            <p>Aiemmat ruokalistat:</p>{% for menu in menus %}{% set timestamp = menu.timestamp.isocalendar() %}
-            <p><a href="/old_menus?week={{ timestamp[1] }}&year={{ timestamp[0] }}">Viikko {{ timestamp[1] }} / {{ timestamp[0] }}</a></p>{% endfor %}
-        </div>{% endif %}
-            
-      {% else %}
-      <a href="/login_page">Kirjaudu sisään</a>
-      <p>tai</p>
-      <a href="/register_page">Rekisteröidy</a>
-      {% endif %}
+        {% else %}
+        <a href="/login_page">Kirjaudu sisään</a>
+        <p>tai</p>
+        <a href="/register_page">Rekisteröidy</a>
+        {% endif %}
     </body>
 </html>
