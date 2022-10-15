@@ -53,7 +53,8 @@ class MenuRepository():
     def replace_menu_meal(self, user_id: int, new_id: int, day_of_week: int):
         query = """
             UPDATE menu_meals SET meal_id = :new_id WHERE menu_id = (SELECT id FROM menus WHERE
-            user_id = :user_id AND DATE_PART('week', timestamp) = DATE_PART('week', NOW())) AND
+            user_id = :user_id AND DATE_PART('week', timestamp) = DATE_PART('week', NOW()) AND
+            DATE_PART('year', timestamp) = DATE_PART('year', NOW())) AND
             day_of_week = :day"""
         parameters = {"user_id":user_id, "new_id":new_id, "day":day_of_week}
 
