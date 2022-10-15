@@ -5,41 +5,163 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="static/css/style.css" rel="stylesheet">
-    </head>
-    <body>
-      {% if session.username %}
-        <a href="/logout">Kirjaudu ulos</a>
-        <div class="container 2xl mx-auto m-14 content-center border-2 border-black">
-          <div id="header" class='m-20'>
-            <h1 class="text-center text-5xl font-bold">Tervetuloa!</h1>
-          </div>
-          {% if meals %}
-          <!--<div><h1 class="text-center text-xl font-bold">Viikon  meals.timestamp.isocalendar()[1]  ruokalista:</h1></div>-->
-          <div><h1 class="text-center text-xl font-bold">Viikon n ruokalista:</h1></div>
-          <div id="content-wrapper" class="m-20 grid grid-cols-7 gap-x-2 text-center">
-            
-            {% for meal in meals.meals %}
+        <link href="static/css/main.css" rel="stylesheet">
+        <!--<script type="text/javascript" src="static/js/manage.js"></script>-->
+        <script>
+          const dateObj = new Date();
+          let dayOfWeek = dateObj.getDay();
+          let generatedMeal;
+          let replaceMealSuccess;
+          let replaceMealTimer;
 
-            <div class="border-2 border-black ">
-              <h1 class="">Måndag:</h1>
-              <p>{{ meal.name }}</p>
+          (dayOfWeek - 1) < 0 ? dayOfWeek = 6 : dayOfWeek--;
+
+          function generateMeal() {
+            const xhttp = new XMLHttpRequest();
+
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    const meal = JSON.parse(this.response);
+                    const mealBox = document.getElementById("generated-meal-box");
+
+                    generatedMeal = meal;
+                    mealBox.innerHTML = meal.meal;
+                    mealBox.classList.remove("mt-10");
+                    mealBox.classList.add("mt-24", "mb-10", "hover:bg-white", "hover:cursor-pointer");
+                    mealBox.onclick = () => { askReplacingMeal(); };
+                }
+            }
+            xhttp.open("GET", "/generate_meal")
+            xhttp.send();
+          }
+
+          function askReplacingMeal() {
+            const confirmText = "Vaihdetaanko päivän ruokalajiksi "+generatedMeal.meal.toLowerCase()+"?";
+
+            if (confirm(confirmText) === true) {
+              const mealBox = document.getElementById("generated-meal-box");
+
+              mealBox.innerHTML = "<img src='static/images/spinner.gif' width='70' height='70'>";
+              mealBox.classList.remove("hover:bg-white", "hover:cursor-pointer");
+              mealBox.onclick = null;
+
+              replaceMeal();
+              checkMealReplaced();
+            }
+          }
+
+          function replaceMeal() {
+            const xhttp = new XMLHttpRequest();
+            const mealForm = new FormData();
+
+            mealForm.append(dayOfWeek, generatedMeal.id);
+            mealForm.append("csrf_token", document.getElementById("csrf-token").value);
+
+            xhttp.onreadystatechange = function() {
+              if (this.readyState == 4 && this.status == 200) {
+                replaceMealSuccess = true;
+              } else {
+                timer = new Date();
+              }
+            }
+            xhttp.open("POST", "/replace_meal");
+            xhttp.send(mealForm);
+          }
+
+          function checkMealReplaced() {
+            if (new Date() - timer > 5000) {
+              setErrorMessage();
+              return false;
+            }
+
+            setTimeout(() => {
+              if (replaceMealSuccess === true) {
+                setMeal();
+                return true;
+              } else {
+                checkMealReplaced();
+              }
+            }, 100);
+          }
+
+          function setMeal() {
+            const mealBox = document.getElementById("generated-meal-box");
+
+            mealBox.innerHTML = generatedMeal.meal;
+            document.getElementById("p-meal-day-"+dayOfWeek).innerHTML = generatedMeal.meal;
+          }
+
+          function setErrorMessage() {
+            const mealBox = document.getElementById("generated-meal-box");
+            const errorText = "Ruokalajin vaihtaminen ei onnistunut, yritä myöhemmin uudestaan.";
+            
+            mealBox.innerHTML = errorText;
+            mealBox.classList.remove("hover:bg-white", "hover:cursor-pointer", "mt-32");
+            mealBox.classList.add("mt-10", "text-red-500", "font-medium");
+            mealBox.onclick = null;
+          }
+        </script>
+    </head>
+    <body class="bg-fixed bg-cover">
+      {% if session.username %}
+        <!--<div class="bg-gradient-to-b from-blue-400 to to-blue-300 w-screen border-y border-black bg-blue-400 grid grid-cols-1 sm:grid-cols-2">bg-gradient-to-b from-blue-900 to-blue-300 border-b border-black">-->
+        <!--<div class="bg-gradient-to-b to-red-600 to from-orange-500 w-screen border-y border-black bg-blue-400 grid grid-cols-1 sm:grid-cols-2">-->
+        <div class="bg-gradient-to-b from-green-600/95 to-emerald-600/90 border-b-2 border-green-900/95  w-screen  grid grid-cols-1 sm:grid-cols-2">
+          <div class="flex items-center justify-center">
+            <p class="font-bold text-white text-lg text-shadow-sm-black">Ruokalistageneraattori</p>
+          </div>
+          <div class="flex flex-col sm:flex-row justify-center items-center">
+            <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black">Etusivu</div>
+            <div onclick="location.replace('/manage')" class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black">Ruokalistat</div>
+            <div onclick="location.replace('/meals')" class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black">Ruokalajit</div>
+            <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black">Reseptit</div>
+            <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black">Muut</div>
+            <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="/logout">Kirjaudu {% if session.username %}ulos{% else %}sisään{% endif %}</a></div>
+          </div>
+        </div>
+        <div class="grid grid-rows-3 sm:grid-cols-3 sm:grid-rows-none place-content-center">
+          <div class="bg-orange-100/90 border border-black m-10 px-10 pt-2 pb-7 rounded ">
+
+            <div class="mx-10 mb-5 mt-5"><p class="text-xl text-center font-bold">Viikon {{ today.isocalendar()[1] }} ruokalista</p></div>{% if meals %}
+
+            <div class="flex flex-col border-x border-t border-black rounded">{% for meal,i in meals %}
+
+              <div class="border-b border-black {%if i == 0 %}rounded-t{% elif i == 6 %}rounded-b{% endif %} text-center hover:bg-white hover:cursor-pointer {% if today.isocalendar()[2]-1 == i %}bg-orange-400{% else %}bg-orange-100{% endif %}">
+                <p class="font-semibold pt-1 pb-2">{{ days[i] }}</p>
+                <p id="p-meal-day-{{ i }}" class="pb-3">{{ meal.name }}</p>
+              </div>{% endfor %}
+            </div>{% else %}
+            <div class="grid grid-rows-3 px-10"><button onclick="location.replace('/generate')" class="row-start-3 bg-green-600 hover:bg-green-700 text-white font-bold my-5 py-2 px-4 border border-green-800 rounded">Generoi ruokalista</button></div>{% endif %}
+          </div>
+
+          <div class="bg-orange-100/90 m-20 px-10 pt-2 pb-5 border border-black rounded flex flex-col items-center justify-center">
+            <div><p class="font-bold text-xl m-5 text-center">Arvo ruokalaji</p></div>
+
+            <div title="Klikkaamalla arvottua ruokalajia voit vaihtaa sen päivän ruokalajiksi." id="generated-meal-box" class="border border-black mt-10 p-10 bg-orange-100 rounded">
+              <p>Generaattori arpoo satunnaisesti yhden ruokalajin niiden ruokalajien joukosta, jotka eivät ole kuluvan viikon ruokalistalla.</p></div>
+
+            <div class="mt-auto mb-32"><button onclick="generateMeal()" class="bg-green-600 hover:bg-green-700 text-white font-bold my-5 py-2 px-4 border border-green-800 rounded">Arvo ruokalaji</button></div>
+          </div>
+
+          <div class="bg-orange-100/90 m-20 px-10 pt-2 pb-5 border border-black rounded">
+            <div><p class="font-bold text-xl m-5 text-center">Uusimmat reseptit</p></div>
+            <div class="bg-orange-100 border border-black rounded my-4 text-center hover:bg-white hover:cursor-pointer">
+              <p class="font-semibold pt-2 pb-2">Raipe</p>
+              <p class="pb-3 px-2">Lihaa ja perunaa!!</p>
+            </div>
+            <div class="bg-orange-100 border border-black rounded my-4 text-center hover:bg-white hover:cursor-pointer">
+              <p class="font-semibold pt-2 pb-2">Marjatta69</p>
+              <p class="pb-3 px-2">Hapansilakkavoileivät</p>
             </div>
 
-            {% endfor %}
-
           </div>
-          {% else %}
-          <div><h1 class="text-center text-xl font-bold"><button onclick="location.replace('/generate')">Generoi ruokalista</button></h1></div>
-        {% endif %}
         </div>
-        <!--<button onclick="location.reload();">Generoi ruokalista</button>-->
-        <button onclick="location.replace('/manage');">Hallitse ruokalistaa</button>
-        <button onclick="location.replace('/meals');">Lisää ruokalajeja</button>
-        <button onclick="location.replace('/old_menus?week=39');">Testaa</button>
+        <input id="csrf-token" type="hidden" value="{{ csrf_token() }}">
       {% else %}
-      <a href="/login_page">Kirjaudu sisään</a>
+      <!--<a href="/login_page">Kirjaudu sisään</a>
       <p>tai</p>
-      <a href="/register_page">Rekisteröidy</a>
+      <a href="/register_page">Rekisteröidy</a>-->
+      {% include "main.html" %}
       {% endif %}
     </body>
 </html>
