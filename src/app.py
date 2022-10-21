@@ -5,6 +5,7 @@ from config import DATABASE_URL, SECRET_KEY
 from database import database
 from blueprints.index import index_blueprint
 from blueprints.users import users_blueprint
+from blueprints.interfaces import interfaces_blueprint
 
 
 def create_app():
@@ -21,6 +22,7 @@ def create_app():
 
     app.register_blueprint(index_blueprint)
     app.register_blueprint(users_blueprint)
+    app.register_blueprint(interfaces_blueprint)
 
     return app
 

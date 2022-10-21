@@ -1,8 +1,12 @@
-from flask import redirect, render_template, Blueprint, request, session, abort, jsonify
+from datetime import datetime
+import time
+from urllib.parse import urlparse
+
+from flask import redirect, render_template, Blueprint, request, session, abort, jsonify, flash
 
 from services.service import Service
 from entities.errors import NotEnoughMealsError
-from utilities import DAYS
+from utilities import DAYS, QTY_UNITS
 
 
 index_blueprint = Blueprint("index_blueprint", __name__)
@@ -12,31 +16,40 @@ serv = Service()
 def index():
     if "uid" in session:
         meals = serv.fetch_menu(session["uid"])
-    else:
-        meals = []
 
-    return render_template("index.html", meals=meals)
+        if meals:
+            return render_template("index.html", meals=zip(meals.meals, [i for i in range(7)]))
+        else:
+            return render_template("index.html", meals=[])
 
 @index_blueprint.route("/generate")
 def generate():
+    header_path = urlparse(request.referrer).path
+
     if "uid" in session:
         serv.generate_menu(session["uid"])
 
-    return redirect("/")
+        if header_path == "/manage":
+            return redirect("/manage")
 
-@index_blueprint.route("/meals")
-def meals():
+        return redirect("/")
+
+@index_blueprint.route("/meals", methods=["GET"])
+@index_blueprint.route("/meal/<int:meal_id>")
+def meals(meal_id=None):
     if "uid" in session:
-        meals = serv.fetch_users_meals(session["uid"])
+        insert_mode = request.args.get("new") or False
+        meals = serv.fetch_user_meals(session["uid"])
+        ingredients = serv.fetch_user_ingredients(session["uid"])
 
-    return render_template("add_meal.html", meals=meals)
+        if not meal_id and not insert_mode:
+            return render_template("meal.html", meals=meals, ingredients=ingredients)
+        elif insert_mode:
+            return render_template("meal.html", insert_mode=True, meals=meals, ingredients=ingredients)
+        else:
+            meal = serv.fetch_single_meal(session["uid"], meal_id=meal_id)
 
-@index_blueprint.route("/add_meal", methods=["POST"])
-def add_meal():
-    if "uid" in session:
-        serv.add_meal(request.form.to_dict(), session["uid"])
-
-    return redirect("/meals")
+            return render_template("meal.html", meal=meal, meals=meals, ingredients=ingredients)
 
 @index_blueprint.route("/manage")
 def manage():
@@ -46,54 +59,16 @@ def manage():
     else:
         menu = []
 
-    return render_template("manage.html", menus=old_menus, menumeals_days=zip(menu.meals,DAYS))
+    return render_template("manage.html", menus=old_menus, menumeals=zip([i for i in range(7)], menu.meals))
 
-@index_blueprint.route("/get_meals")
-def get_meals():
-    if "uid" in session:
-        meals = {meal.id:meal.name for meal in serv.fetch_users_meals(session["uid"])}
+@index_blueprint.route("/check_username", methods=["GET"])
+def testitee():
 
-        try:
-            mela = jsonify(meals)
-            return mela
-        except NotEnoughMealsError:
-            return ":("
+    if request.args.get("uname") == "vittuu" or request.args.get("uname") == "vittu2":
+        return "NOK"
     else:
-        abort(403)
-
-@index_blueprint.route("/replace_meal", methods=["POST"])
-def replace_meal():
-    if "uid" in session:
-        form_data = list(request.form.items())
-        serv.replace_meal(session["uid"], form_data[0])
-
         return "OK"
 
-@index_blueprint.route("/generate_meal")
-def generate_meal():
-    if "uid" in session:
-        meal = serv.generate_meal(session["uid"])
-
-        return jsonify({"meal":meal.name, "id":meal.id})
-
-@index_blueprint.route("/old_menus", methods=["GET"])
-def old_menus():
-    if request.args:
-        old_menus = serv.fetch_old_menus(session["uid"])
-        selected_menu = serv.fetch_menu_by_timestamp(session["uid"], request.args.get("week"), request.args.get("year"))
-
-        return render_template("old_menus.html", menus=old_menus, sele_days=zip(selected_menu.meals,DAYS))
-    else:
-        old_menus = serv.fetch_old_menus(session["uid"])
-
-        return render_template("old_menus.html", menus=old_menus)
-
-@index_blueprint.route("/replace_menu", methods=["GET"])
-def replace_menu():
-    if request.args:
-        status = serv.replace_current_menu_with(session["uid"], request.args.get("week"), request.args.get("year"))
-
-        if status is True:
-            return "OK"
-
-        return "NOK"
+@index_blueprint.context_processor
+def utilities():
+    return dict(today=datetime.today(), days=DAYS, day_numbers=[i for i in range(7)], qty_units=QTY_UNITS)
