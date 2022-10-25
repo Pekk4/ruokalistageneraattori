@@ -1,14 +1,12 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Tervetuloa</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
-        <script src="{{ url_for('static', filename='js/modal.js') }}"></script> 
+{%- extends "base.html" -%}
+    {%- block title -%}Tervetuloa!{%- endblock -%}
+    {%- block head -%}
+        {{ super() }}
+        {%- if session.username %}
         <script src="{{ url_for('static', filename='js/meal.js') }}"></script>
-    </head>
-    {% include "header.html" %}{% if session.username %}
+        {%- endif %}
+    {%- endblock -%}
+    {%- block content -%}
         <form id="meal-form" autocomplete="off" class="{% if not meal and not insert_mode %}hidden {% endif %}h-full">
             <div id="add-meal-body" class="m-14 h-3/4 grid grid-cols-2">
                 <div id="add-meal-div" class="bg-orange-100 border border-black rounded overflow-y-auto flex flex-col pt-10 pb-5 mx-28 place-items-center relative">
@@ -32,31 +30,40 @@
                                     <th><input name="ingredient_name" class="m-[1px] border border-black rounded-md px-1 py-0.5"></th>
                                     <th><input name="qty" class="border border-black rounded-md px-1 py-0.5" size="5"></th>
                                     <th>
-                                        <select name="unit">{% for unit in qty_units %}
-                                            <option>{{ unit }}</option>{% endfor %}
+                                        <select name="unit">
+                                            {% for unit in qty_units -%}
+                                            <option>{{ unit }}</option>
+                                            {% endfor %}
                                         </select>
                                     </th>
-                                </tr>{% if meal %}{% for ingredient in meal.ingredients %}
+                                </tr>
+                                {% if meal %}{% for ingredient in meal.ingredients %}
                                 <tr>
                                     <th class="hover:cursor-pointer px-1" onclick="removeRow(this, true)"><img src="{{ url_for('static', filename='images/cancel.png') }}"></th>
                                     <th><input name="ingredient_name" class="m-[1px] border border-black rounded-md px-1 py-0.5" value="{{ ingredient.name }}"></th>
                                     <th><input name="qty" class="border border-black rounded-md px-1 py-0.5" size="5" value="{{ ingredient.qty }}"></th>
                                     <th>
-                                        <select name="unit" autocomplete="off">{% for unit in qty_units %}
-                                            <option{% if unit == ingredient.qty_unit %} selected{% endif %}>{{ unit }}</option>{% endfor %}
+                                        <select name="unit" autocomplete="off">
+                                            {% for unit in qty_units -%}
+                                            <option{% if unit == ingredient.qty_unit %} selected{% endif %}>{{ unit }}</option>
+                                            {% endfor %}
                                         </select>
                                     </th>
-                                </tr>{% endfor %}{% else %}
+                                </tr>
+                                {% endfor %}{% else -%}
                                 <tr>
                                     <th class="hover:cursor-pointer px-1" onclick="removeRow(this)"><img src="{{ url_for('static', filename='images/cancel.png') }}"></th>
                                     <th><input name="ingredient_name" class="m-[1px] border border-black rounded-md px-1 py-0.5"></th>
                                     <th><input name="qty" class="border border-black rounded-md px-1 py-0.5" size="5"></th>
                                     <th>
-                                        <select name="unit" autocomplete="off">{% for unit in qty_units %}
-                                            <option>{{ unit }}</option>{% endfor %}
+                                        <select name="unit" autocomplete="off">
+                                            {% for unit in qty_units -%}
+                                            <option>{{ unit }}</option>
+                                            {% endfor %}
                                         </select>
                                     </th>
-                                </tr>{% endif %}
+                                </tr>
+                                {%- endif %}
                             </tbody>
                         </table>
                         <input id="csrf_token" type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -99,10 +106,12 @@
                     <div class="border border-black rounded bg-orange-100 mx-14 mt-8 grid {% if meal %}grid-cols-2{% endif %} place-items-center">
                         <button onclick="submitMeal(false)" type="button" class=" bg-green-600 hover:bg-green-700 text-white font-bold px-24 py-4 border border-green-800 rounded">
                             Tallenna
-                        </button>{% if meal %}
+                        </button>
+                        {%- if meal -%}
                         <button onclick="confirmDeleteMeal()" type="button" class=" bg-red-600 hover:bg-red-700 text-white font-bold px-16 py-4 border border-green-800 rounded">
                             Poista ruokalaji
-                        </button>{% endif %}
+                        </button>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -110,8 +119,10 @@
         <div id="main-content" class="{% if meal or insert_mode %}hidden {% endif %}mt-16 mx-44 grid grid-cols-2 justify-center">
             <div title="Klikkaamalla ruokalajia pääset tarkastelemaan sen tietoja." class="bg-orange-100 border border-black rounded px-10 pb-5 mx-32 text-center">
                 <p class="font-bold text-xl text-center m-5">Ruokalajit:</p>
-                <div class="item-name border border-black rounded bg-orange-50 h-[500px] overflow-x-hidden overflow-y-auto text-left mb-5 py-3 w-full break-words">{% for meal in meals %}
-                    <p class="px-5 hover:font-semibold"><a href="/meal/{{ meal.db_id }}">{{ meal }}</a></p>{% endfor %}
+                <div class="item-name border border-black rounded bg-orange-50 h-[500px] overflow-x-hidden overflow-y-auto text-left mb-5 py-3 w-full break-words">
+                    {% for meal in meals -%}
+                    <p class="px-5 hover:font-semibold"><a href="/meal/{{ meal.db_id }}">{{ meal }}</a></p>
+                    {% endfor %}
                 </div>
                 <button onclick="{% if meal %}location.replace('/meals?new=0'){% else %}addMeal(){% endif %}" class="m-5 bg-green-600 hover:bg-green-700 text-white font-bold px-2 py-1 border border-green-800 rounded">
                     Lisää ruokalaji
@@ -119,12 +130,11 @@
             </div>
             <div title="Klikkaamalla raaka-ainetta pääset tarkastelemaan sen tietoja." class="bg-orange-100 border border-black rounded px-10 pb-10 mx-32 text-center">
                 <p class="font-bold text-xl text-center m-5">Raaka-aineet:</p>
-                <div class="border border-black rounded bg-orange-50 h-[500px] overflow-x-hidden overflow-y-auto text-left mb-2 py-3 w-full break-words">{% for ingredient in ingredients %}
-                    <p class="px-5 hover:font-semibold">{{ ingredient }}</p>{% endfor %}
+                <div class="border border-black rounded bg-orange-50 h-[500px] overflow-x-hidden overflow-y-auto text-left mb-2 py-3 w-full break-words">
+                    {% for ingredient in ingredients -%}
+                    <p class="px-5 hover:font-semibold">{{ ingredient }}</p>
+                    {%- endfor %}
                 </div>
             </div>
         </div>
-        {% endif %}
-        {% include "modal.html" %}
-    </body>
-</html>
+    {%- endblock -%}

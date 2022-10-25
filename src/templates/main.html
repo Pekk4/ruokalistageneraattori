@@ -1,189 +1,40 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="../static/css/style.css" rel="stylesheet">
-    <link href="../static/css/main.css" rel="stylesheet">
-    <script>
-        let usernameOk;
-        let passwordOk;
-        let usernameFree;
-
-        function activateForm(action) {
-            const loginBox = document.getElementById("login-box");
-            const itemsBox = document.getElementById("items-box");
-            const getButton = document.getElementById("login-box-button");
-            let widthCounter = 1500;
-            let heightCounter = 224;
-
-            getButton.innerHTML = action;
-            loginBox.style = "width: "+widthCounter+"px; height: "+heightCounter+"px;";
-            itemsBox.style = "display: none;";
-
-            let animationInterval = setInterval(animateResize, 1);
-
-            function animateResize() {
-                widthCounter = widthCounter - 20;
-
-                if (heightCounter <= 384) {
-                    heightCounter = heightCounter + 10;
-                }
-                if (widthCounter < 384) {
-                    clearInterval(animationInterval);
-                    document.getElementById("login-form").style = "";
-                } else {
-                    loginBox.style = "width: "+widthCounter+"px; height: "+heightCounter+"px;";
-                }
-            }
-
-            if (action == "Rekisteröidy") {
-                addListeners();
-            } else {
-                usernameFree = usernameOk = passwordOk = true;
-                unlockButton(true);
-            }
-        }
-
-        function addListeners() {
-            const unameField = document.getElementById("username-field");
-            const pwordField = document.getElementById("password-field");
-
-            unameField.addEventListener("keyup", event => {
-                let inputValue = event.target.value;
-                let isValid = validateUsername(inputValue);
-
-                unameField.value = inputValue.replace(/\s+/g, "");
-
-                isValid === true ? askUsernameStatus(inputValue) : null
-            });
-
-            unameField.addEventListener("focusout", event => {
-                let inputValue = event.target.value;
-                let isValid = validateUsername(inputValue);
-
-                isValid === true ? askUsernameStatus(inputValue) : null
-            });
-
-            pwordField.addEventListener("keyup", event => {
-                let inputValue = event.target.value;
-
-                pwordField.value = inputValue.replace(/\s+/g, "");
-
-                validatePassword(inputValue);
-            });
-        }
-
-        function askUsernameStatus(username) {
-            const xhttp = new XMLHttpRequest();
-
-            xhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    usernameFree = this.responseText;
-                }
-            }
-            xhttp.open("GET", "/check_username?uname="+username)
-            xhttp.send();
-
-            checkUsernameStatus();
-        }
-
-        function checkUsernameStatus() {
-            document.getElementById("uname-free-notification").style = "display: none";
-
-            setTimeout(() => {
-                if (usernameFree == "OK") {
-                    usernameFree = true
-                    unlockButton(true);
-                } else if (usernameFree == "NOK") {
-                    usernameFree = false;
-                    document.getElementById("uname-free-notification").style = "";
-                }
-            }, 500);
-        }
-
-        function validateUsername(username) {
-            let checkString = username.replace(/\s+/g, "");
-
-            if (checkString.length < 5) {
-                document.getElementById("username-notification").style = "";
-
-                unlockButton();
-
-                return false;
-            } else {
-                document.getElementById("username-notification").style = "display: none;";
-                usernameOk = true;
-
-                unlockButton(true);
-
-                return true;
-            }
-        }
-
-        function validatePassword(password) {
-            const specialChars = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
-            const numbers = /[0123456789]/;
-
-            if ((password.length < 8) || (!specialChars.test(password)) || (!numbers.test(password))) {
-                document.getElementById("password-notification").style = "";
-
-                unlockButton();
-            } else {
-                document.getElementById("password-notification").style = "display: none;";
-                passwordOk = true;
-
-                unlockButton(true);
-            }
-        }
-
-        function unlockButton(enable = false) {
-            const submitButton = document.getElementById("login-box-button");
-
-            if (enable === true) {
-                if ((usernameOk === true) && (passwordOk === true) && (usernameFree === true)) {
-                    submitButton.disabled = false;
-
-                    submitButton.classList.remove("bg-blue-300");
-                    submitButton.classList.add("hover:bg-blue-700");
-                    submitButton.classList.add("bg-blue-500");
-                }
-            } else {
-                submitButton.disabled = true;
-
-                submitButton.classList.remove("hover:bg-blue-700");
-                submitButton.classList.remove("bg-blue-500");
-                submitButton.classList.add("bg-blue-300");
-            }
-        }
-    </script>
-</head>
-<body class="bg-fixed bg-cover">
-    <div class="flex items-center justify-center my-14 sm:h-screen sm:my-0 ">
-        <div id="login-box" class="bg-white/[.85] flex items-center justify-center w-96 h-96 border-black border rounded" style="display: none;">
-            <form id="login-form" action="/login" method="POST" class="text-center" style="display: none;" autocomplete="off">
-                <p class="my-1 py-1">Tunnus:<br>
-                <input id="username-field" type="text" name="username" class="border border-black rounded my-2"></p>
-                <p class="my-1 py-1">Salasana:<br>
-                <input id="password-field" type="password" name="password" class="border border-black rounded my-2"></p>
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <p id="username-notification" class="font-semibold px-10 py-2 text-sm text-red-500" style="display: none;">Käyttäjätunnuksen täytyy olla vähintään viisi merkkiä pitkä</p>
-                <p id="password-notification" class="font-semibold px-10 py-2 text-sm text-red-500" style="display: none;">Salasanan täytyy olla vähintään kahdeksan merkkiä pitkä ja sisältää myös numeroita sekä erikoismerkkejä</p>
-                <p id="uname-free-notification" class="font-semibold px-10 py-2 text-sm text-red-500" style="display: none;">Käyttäjätunnus on jo käytössä, valitse toinen</p>
-                <button id="login-box-button" class="bg-blue-300 text-white font-bold my-3 py-2 px-4 border border-blue-700 rounded" disabled>Kirjaudu</button>
-            </form>
-        </div>
-        <div id="items-box" class="grid grid-cols-1 sm:grid-cols-3 bg-white/[.85] mx-14 border border-black rounded">
-            <div class="m-5 sm:col-span-2">
-                <p class="">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quis nisi magna. Morbi sodales nulla ante, ac aliquet orci volutpat ac. Fusce pellentesque dui eget malesuada molestie. Nullam porta et neque volutpat malesuada. Vivamus ac auctor urna, sit amet tristique lacus. Quisque sit amet aliquam mauris, sit amet volutpat nisi. Cras</p><br><p>Pulvinar dapibus ultrices. Duis porttitor eros nec lectus volutpat, vel egestas purus accumsan. Maecenas scelerisque sapien dui, et rhoncus tellus semper sed. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Curabitur non enim id eros placerat vestibulum vel quis magna. Sed leo diam, convallis interdum egestas eu, placerat non purus.</p>
+    {%- block login -%}
+        <div class="flex items-center justify-center my-14 sm:h-screen sm:my-0">
+            <div id="login-box" class=" bg-orange-100/90 flex items-center justify-center w-96 h-96 border-black border rounded" style="display: none;">
+                <form id="login-form" action="/login" method="POST" class="text-center" style="display: none;" autocomplete="off">
+                    <p class="my-1 py-1">
+                        Tunnus:<br>
+                        <input id="username-field" type="text" name="username" class="border border-black rounded my-2">
+                    </p>
+                    <p class="my-1 py-1">
+                        Salasana:<br>
+                        <input id="password-field" type="password" name="password" class="border border-black rounded my-2">
+                    </p>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <p id="username-notification" class="font-semibold px-10 py-2 text-sm text-red-500" style="display: none;">
+                        Käyttäjätunnuksen täytyy olla vähintään viisi merkkiä pitkä
+                    </p>
+                    <p id="password-notification" class="font-semibold px-10 py-2 text-sm text-red-500" style="display: none;">
+                        Salasanan täytyy olla vähintään kahdeksan merkkiä pitkä ja sisältää myös numeroita sekä erikoismerkkejä
+                    </p>
+                    <p id="uname-free-notification" class="font-semibold px-10 py-2 text-sm text-red-500" style="display: none;">
+                        Käyttäjätunnus on jo käytössä, valitse toinen
+                    </p>
+                    <button id="login-box-button" class="bg-green-400 text-white font-bold my-3 py-2 px-4 border border-green-800 rounded" disabled>
+                        Kirjaudu
+                    </button>
+                </form>
             </div>
-            <div class="m-5 flex flex-col items-center justify-center">
-                <button id="login-button" onclick="activateForm('Kirjaudu sisään')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold my-5 py-2 px-4 border border-blue-700 rounded">Kirjaudu sisään</button>
-                <button id="register-button" onclick="activateForm('Rekisteröidy')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold my-5 py-2 px-4 border border-blue-700 rounded">Rekisteröidy</button>
+            <div id="items-box" class="grid grid-cols-1 sm:grid-cols-3 bg-orange-100/90 mx-14 border border-black rounded">
+                <div class="m-5 sm:col-span-2">
+                    <p class="">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quis nisi magna. Morbi sodales nulla ante, ac aliquet orci volutpat ac. Fusce pellentesque dui eget malesuada molestie. Nullam porta et neque volutpat malesuada. Vivamus ac auctor urna, sit amet tristique lacus. Quisque sit amet aliquam mauris, sit amet volutpat nisi. Cras</p><br><p>Pulvinar dapibus ultrices. Duis porttitor eros nec lectus volutpat, vel egestas purus accumsan. Maecenas scelerisque sapien dui, et rhoncus tellus semper sed. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Curabitur non enim id eros placerat vestibulum vel quis magna. Sed leo diam, convallis interdum egestas eu, placerat non purus.
+                    </p>
+                </div>
+                <div class="m-5 flex flex-col items-center justify-center">
+                    <button id="login-button" onclick="activateForm('Kirjaudu sisään')" class="bg-green-600 hover:bg-green-700 text-white font-bold my-5 py-2 px-4 border border-green-800 rounded">Kirjaudu sisään</button>
+                    <button id="register-button" onclick="activateForm('Rekisteröidy')" class="bg-green-600 hover:bg-green-700 text-white font-bold my-5 py-2 px-4 border border-green-800 rounded">Rekisteröidy</button>
+                </div>
             </div>
         </div>
-    </div>
-</body>
-</html>
+    {%- endblock -%}
