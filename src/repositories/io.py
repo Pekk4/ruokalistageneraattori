@@ -1,6 +1,7 @@
 import logging
 import logging.config
-from sqlalchemy.exc import SQLAlchemyError
+
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from database import database as default_db
 from config import LOGGER_CONFIG_FILE as default_logger_path
@@ -20,9 +21,9 @@ class InputOutput:
 
             return results
 
-        except SQLAlchemyError as error: # katsotaan nyt, mitä tälle vielä sitten tehdään :|
+        except SQLAlchemyError as error:
             self.logger.error(error)
-            return []
+            raise
 
     def write(self, query, *parameters):
         try:
@@ -34,9 +35,11 @@ class InputOutput:
 
             return True
 
-        except SQLAlchemyError as error: # sama juttu
+        except IntegrityError:
+            raise
+        except SQLAlchemyError as error:
             self.logger.error(error)
-            return False
+            raise
 
     def write_many(self, query, parameters: list):
         try:
@@ -53,6 +56,8 @@ class InputOutput:
             self.session.commit()
             return return_value
 
-        except SQLAlchemyError as error: # ja sama juttu
+        except IntegrityError:
+            raise
+        except SQLAlchemyError as error:
             self.logger.error(error)
-            return False
+            raise

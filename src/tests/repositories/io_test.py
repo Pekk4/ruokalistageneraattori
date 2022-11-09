@@ -55,19 +55,18 @@ class TestRepository(unittest.TestCase):
         self.assertIsInstance(results[0], Mock)
         self.assertEqual(str(results[1]), str(self.test_results[1]))
 
-    def test_read_returns_correctly_on_exception(self):
+    def test_read_raises_exception_on_exception(self):
         self.return_value_mock.fetchall.side_effect = SQLAlchemyError
 
-        results = self.input_output.read(self.select_query)
-
-        self.assertEqual(len(results), 0)
-        self.assertIsInstance(results, list)
+        with self.assertRaises(SQLAlchemyError):
+            self.input_output.read(self.select_query)        
 
     def test_read_logging_on_exception(self):
         self.return_value_mock.fetchall.side_effect = SQLAlchemyError("Perskeles!")
 
-        with self.assertLogs() as logs:
-            self.input_output.read(self.select_query)
+        with self.assertRaises(SQLAlchemyError):
+            with self.assertLogs() as logs:
+                self.input_output.read(self.select_query)
 
         self.assertEqual(len(logs.records), 1)
         self.assertEqual(logs.records[0].getMessage(), "Perskeles!")
@@ -93,17 +92,18 @@ class TestRepository(unittest.TestCase):
     def test_write_returns_correct_without_returning_command_in_query(self):
         self.assertTrue(self.input_output.write(self.insert_query_1))
 
-    def test_write_returns_correctly_on_exception(self):
+    def test_write_raises_exception_on_exception(self):
         self.db_session_mock.commit.side_effect = SQLAlchemyError
 
-        self.assertFalse(self.input_output.write(self.insert_query_1))
-        self.assertFalse(self.input_output.write(self.insert_query_1, self.query_variables))
+        with self.assertRaises(SQLAlchemyError):
+            self.input_output.write(self.insert_query_1)
 
     def test_write_logging_on_exception(self):
         self.db_session_mock.commit.side_effect = SQLAlchemyError("Tietokanta päreinä!")
 
-        with self.assertLogs() as logs:
-            self.input_output.write(self.insert_query_1)
+        with self.assertRaises(SQLAlchemyError):
+            with self.assertLogs() as logs:
+                self.input_output.write(self.insert_query_1)
 
         self.assertEqual(len(logs.records), 1)
         self.assertEqual(logs.records[0].getMessage(), "Tietokanta päreinä!")
@@ -163,16 +163,18 @@ class TestRepository(unittest.TestCase):
         self.assertEqual(len(return_value), 2)
         self.assertEqual(str(return_value[0]), str(self.test_results[0]))
 
-    def test_write_many_returns_correctly_on_exception(self):
+    def test_write_many_raises_exception_on_exception(self):
         self.db_session_mock.commit.side_effect = SQLAlchemyError
 
-        self.assertFalse(self.input_output.write_many(self.insert_query_1, self.dict_list))
+        with self.assertRaises(SQLAlchemyError):
+            self.input_output.write_many(self.insert_query_1, self.dict_list)
 
     def test_write_many_logging_on_exception(self):
         self.db_session_mock.commit.side_effect = SQLAlchemyError("Tietokanta päreinä!")
 
-        with self.assertLogs() as logs:
-            self.input_output.write_many(self.insert_query_1, self.dict_list)
+        with self.assertRaises(SQLAlchemyError):
+            with self.assertLogs() as logs:
+                self.input_output.write_many(self.insert_query_1, self.dict_list)
 
         self.assertEqual(len(logs.records), 1)
         self.assertEqual(logs.records[0].getMessage(), "Tietokanta päreinä!")
