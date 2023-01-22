@@ -20,7 +20,7 @@ function activateNotifyModal(modalNote, isWarning = true, buttonFunction = false
         paragraphElem.classList.replace("text-black", "text-red-500");
     }
 
-    if(buttonFunction != false) {
+    if (buttonFunction != false) {
         document.getElementById("modal-ok-button").onclick = () => { closeModal(buttonFunction); };
     }
 }

@@ -44,7 +44,7 @@ function submitMeal(updateMeal = true) {
     const askForNew = "Haluatko lisätä uuden ruokalajin?"
 
     xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
+        if (this.readyState == 4 && this.status == 201) {
             if (updateMeal === true) {
                 activateAskModal(
                     updatedText + " " + askForNew,
@@ -64,6 +64,8 @@ function submitMeal(updateMeal = true) {
             } else {
                 activateNotifyModal(this.responseText);
             }
+        } else if (this.readyState == 4 && this.status == 500) {
+            activateNotifyModal(this.responseText);
         } else {
             activateSpinnerModal();
         }
@@ -182,13 +184,13 @@ function deleteMeal() {
     mealObj["meal_name"] = mealName;
 
     xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
+        if (this.readyState == 4 && this.status == 201) {
             activateNotifyModal(
                 "Ruokalaji poistettu.",
                 false,
                 () => { location.replace("/meals"); }
             );
-        } else if (this.readyState == 4 && this.status == 422) {
+        } else if (this.readyState == 4 && this.status == 500) {
             activateNotifyModal(this.responseText);
         } else {
             activateSpinnerModal();
