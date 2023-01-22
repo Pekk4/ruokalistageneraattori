@@ -1,6 +1,5 @@
 class Menu:
-
-    def __init__(self, meals: list, timestamp, db_id=False):
+    def __init__(self, meals: list, timestamp: str, db_id: int = False):
         if len(meals) < 7:
             raise ValueError("Seven meals required!")
         else:
