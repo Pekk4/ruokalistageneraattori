@@ -3,7 +3,7 @@
 @tailwind utilities;
 
  /* For width smaller than 400px: */
- body {
+  body {
     background-image: url('../images/bg2.jpg');
   }
   
@@ -12,4 +12,76 @@
     body {
       background-image: url('../images/bg1.jpg');
     }
-  } 
+  }
+
+  #meal-name-0, #single-meal-div-0 {
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+  }
+
+  #meal-name-1, #single-meal-div-1 {
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+  }
+
+  #meal-name-2, #single-meal-div-2 {
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+  }
+
+  #meal-name-3, #single-meal-div-3 {
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+  }
+
+  #meal-name-4, #single-meal-div-4 {
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+  }
+
+  #meal-name-5, #single-meal-div-5 {
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+  }
+
+  #meal-name-6, #single-meal-div-6 {
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+  }
+
+  div.single-meal {
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+  }
+
+  div.item-name {
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+  }
+
+  p#paska {
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+  }
+
+  
