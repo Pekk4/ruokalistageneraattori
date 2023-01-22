@@ -1,119 +1,127 @@
-from datetime import datetime
-import time
 from urllib.parse import urlparse
 
-from flask import redirect, render_template, Blueprint, request, session, abort, jsonify
+from flask import Blueprint, jsonify, request, session
 
-from services.service import Service
-from entities.errors import NotEnoughMealsError
-from utilities import DAYS
+from services.meal_service import MealService
+from services.menu_service import MenuService
+from utilities import check_session
 
 
 interfaces_blueprint = Blueprint("interfaces_blueprint", __name__)
-serv = Service()
+meal_service = MealService()
+menu_service = MenuService()
+message = "Please, log in first. \N{slightly smiling face}"
 
 @interfaces_blueprint.route("/get_meals")
 def get_meals():
-    if "uid" in session:
-        meals = {meal.id:meal.name for meal in serv.fetch_users_meals(session["uid"])}
+    user_id = check_session(session, request)
 
-        try:
-            mela = jsonify(meals)
-            #time.sleep(3)
-            return mela
-        except NotEnoughMealsError:
-            return ":("
-    else:
-        abort(403)
+    if user_id:
+        meals = meal_service.fetch_user_meals(user_id)
+
+        if isinstance(meals, list):
+            return jsonify({meal.db_id:meal.name for meal in meals}), 200
+
+        return meals, 500
+
+    return message, 403
 
 @interfaces_blueprint.route("/replace_meal", methods=["POST"])
 def replace_meal():
-    if "uid" in session:
+    user_id = check_session(session, request)
+
+    if user_id:
         form_data = list(request.form.items())
+        status = menu_service.replace_meal(session["uid"], form_data[0])
 
-        serv.replace_meal(session["uid"], form_data[0])
+        if isinstance(status, str):
+            return status, 500
 
-        print(list(request.form.items()))
-        #time.sleep(3)
-        return "OK"
+        return "OK", 201
+
+    return message, 403
 
 @interfaces_blueprint.route("/generate_meal")
 def generate_meal():
-    if "uid" in session:
-        meal = serv.generate_meal(session["uid"])
+    user_id = check_session(session, request)
 
-        return jsonify({"meal":meal.name, "id":meal.id})
+    if user_id:
+        meal = menu_service.generate_meal(user_id)
 
-@interfaces_blueprint.route("/old_menus", methods=["GET"])
-def old_menus():
-    if request.args:
-        old_menus = serv.fetch_old_menus(session["uid"])
-        selected_menu = serv.fetch_menu_by_timestamp(session["uid"], request.args.get("week"), request.args.get("year"))
+        if isinstance(meal, str):
+            return meal, 500
 
-        return render_template("old_menus.html", menus=old_menus, timestamp=selected_menu.timestamp.isocalendar(), sele_days=zip([i for i in range(7)], selected_menu.meals))
-    else:
-        old_menus = serv.fetch_old_menus(session["uid"])
+        return jsonify({"meal":meal.name, "id":meal.db_id}), 200
 
-        return render_template("old_menus.html", menus=old_menus)
+    return message, 403
 
 @interfaces_blueprint.route("/replace_menu", methods=["GET"])
 def replace_menu():
-    if request.args:
-        status = serv.replace_current_menu_with(session["uid"], request.args.get("week"), request.args.get("year"))
+    user_id = check_session(session, request)
 
-        if status is True:
-            return "OK"
+    if user_id and request.args:
+        args = request.args
+        status = menu_service.replace_current_menu_with(user_id, args.get("week"), args.get("year"))
 
-        return "NOK"
+        if isinstance(status, str):
+            return status, 500
 
+        return "OK", 200
+
+    return message, 403
 
 @interfaces_blueprint.route("/add_meal", methods=["POST", "GET"])
 def add_meal():
-    if "uid" in session:
+    user_id = check_session(session, request)
+
+    if user_id:
         request_path = urlparse(request.referrer).path.split("/")
         meal_data = request.get_json()
 
         if request.args.get("update") == "true":
             meal_name = meal_data["meal_name"]
-            status = serv.update_meal(session["uid"], meal_data, meal_name=meal_name)
+            status = meal_service.update_meal(user_id, meal_data, meal_name=meal_name)
 
             if isinstance(status, str):
-                return status, 422
+                if "Samanniminen" in status:
+                    return status, 422
+
+                return status, 500
         else:
             if request_path[1] == "meal":
                 meal_id = request_path[2]
-                status = serv.update_meal(session["uid"], meal_data, meal_id=meal_id)
+                status = meal_service.update_meal(session["uid"], meal_data, meal_id=meal_id)
             if request_path[1] == "meals":
-                status = serv.add_meal(session["uid"], meal_data)
+                status = meal_service.add_meal(session["uid"], meal_data)
 
             if isinstance(status, str):
-                return status, 422
+                if "Samanniminen" in status:
+                    return status, 422
 
-        return "OK"
-    
-    return "NOK"
+                return status, 500
+
+        return "OK", 201
+
+    return message, 403
 
 @interfaces_blueprint.route("/delete_meal", methods=["POST"])
 def delete_meal():
-    if "uid" in session:
+    user_id = check_session(session, request)
+
+    if user_id:
         meal = request.get_json()
         origin_path = urlparse(request.referrer).path.split("/")
         meal_id = origin_path[2]
 
-        status = serv.delete_meal(session["uid"], meal_id, meal)
+        status = meal_service.delete_meal(user_id, meal_id, meal)
 
         if isinstance(status, str):
-            return status, 422
+            return status, 500
 
-    return "OK"
+        return "OK", 201
 
-@interfaces_blueprint.context_processor
-def testitee():
-    return dict(today=datetime.today(), days=DAYS)
+    return message, 403
 
-
-@interfaces_blueprint.route("/ammu")
-def ammu():
-    serv.ammu()
-
-    return "OK"
+@interfaces_blueprint.route("/check_username", methods=["GET"])
+def check_username_availability():
+    return "OK", 200

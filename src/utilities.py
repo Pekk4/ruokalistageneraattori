@@ -11,6 +11,23 @@ DAYS = {
     6: "Sunnuntai",
 }
 
+QTY_UNITS = [
+    "kpl",
+    "mm",
+    "tl",
+    "rkl",
+    "kkp",
+    "ml",
+    "dl",
+    "l",
+    "g",
+    "kg",
+    "pkt",
+    "tlk",
+    "rs",
+    "pss"
+]
+
 def validate_week_number(week_number: int):
     weeks_this_year = date(date.today().year, 12, 28).isocalendar()[1]
 
@@ -27,3 +44,13 @@ def validate_year(year: int):
 
     raise ValueError("invalid year")
 
+def check_session(session, request):
+    if "uid" in session:
+        if (session["uagent"] == request.user_agent.string
+                and session["remote_addr"] == request.remote_addr):
+
+            return session["uid"]
+        else:
+            session.clear()
+
+    return False

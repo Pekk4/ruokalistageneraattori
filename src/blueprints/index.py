@@ -1,74 +1,155 @@
 from datetime import datetime
-import time
 from urllib.parse import urlparse
 
-from flask import redirect, render_template, Blueprint, request, session, abort, jsonify, flash
+from flask import Blueprint, redirect, render_template, flash, request, session
 
-from services.service import Service
-from entities.errors import NotEnoughMealsError
-from utilities import DAYS, QTY_UNITS
+from services.meal_service import MealService
+from services.menu_service import MenuService
+from utilities import DAYS, QTY_UNITS, check_session
 
 
 index_blueprint = Blueprint("index_blueprint", __name__)
-serv = Service()
+meal_service = MealService()
+menu_service = MenuService()
 
 @index_blueprint.route("/")
 def index():
-    if "uid" in session:
-        meals = serv.fetch_menu(session["uid"])
+    user_id = check_session(session, request)
+    page = render_template("index.html")
 
-        if meals:
-            return render_template("index.html", meals=zip(meals.meals, [i for i in range(7)]))
+    if user_id:
+        menu = menu_service.fetch_menu(user_id)
+
+        if isinstance(menu, str):
+            flash(menu)
         else:
-            return render_template("index.html", meals=[])
+            page = render_template("index.html", menu=zip(menu.meals, list(range(7))))
+
+    return page
 
 @index_blueprint.route("/generate")
-def generate():
+def generate_menu():
     header_path = urlparse(request.referrer).path
+    user_id = check_session(session, request)
 
-    if "uid" in session:
-        serv.generate_menu(session["uid"])
+    if user_id:
+        message = menu_service.generate_menu(user_id)
 
-        if header_path == "/manage":
-            return redirect("/manage")
+        if message:
+            flash(message)
 
-        return redirect("/")
+    if header_path == "/manage":
+        return redirect("/manage")
+
+    return redirect("/")
 
 @index_blueprint.route("/meals", methods=["GET"])
-@index_blueprint.route("/meal/<int:meal_id>")
-def meals(meal_id=None):
-    if "uid" in session:
-        insert_mode = request.args.get("new") or False
-        meals = serv.fetch_user_meals(session["uid"])
-        ingredients = serv.fetch_user_ingredients(session["uid"])
+def view_meals():
+    user_id = check_session(session, request)
+    page = render_template("meal.html")
 
-        if not meal_id and not insert_mode:
-            return render_template("meal.html", meals=meals, ingredients=ingredients)
-        elif insert_mode:
+    if user_id:
+        meals = meal_service.fetch_user_meals(user_id)
+        ingredients = meal_service.fetch_user_ingredients(user_id)
+
+        if isinstance(meals, str):
+            flash(meals)
+
+            return page
+
+        if "new" in request.args:
             return render_template("meal.html", insert_mode=True, meals=meals, ingredients=ingredients)
-        else:
-            meal = serv.fetch_single_meal(session["uid"], meal_id=meal_id)
 
-            return render_template("meal.html", meal=meal, meals=meals, ingredients=ingredients)
+        page = render_template("meal.html", meals=meals, ingredients=ingredients)
+
+    return page
+
+@index_blueprint.route("/meal/")
+@index_blueprint.route("/meal/<int:meal_id>")
+def view_meal(meal_id=None):
+    page = render_template("meal.html")
+
+    if meal_id:
+        user_id = check_session(session, request)
+
+        if user_id:
+            meal = meal_service.fetch_single_meal(user_id, meal_id=meal_id)
+            meals = meal_service.fetch_user_meals(user_id)
+            ingredients = meal_service.fetch_user_ingredients(user_id)
+
+            if isinstance(meal, str):
+                flash(meal)
+
+                return page
+
+            if isinstance(meals, str):
+                flash(meals)
+
+                return page
+
+            page = render_template("meal.html", meal=meal, meals=meals, ingredients=ingredients)
+
+        return page
+
+    return redirect("/")
 
 @index_blueprint.route("/manage")
-def manage():
-    if "uid" in session:
-        menu = serv.fetch_menu(session["uid"])
-        old_menus = serv.fetch_old_menus(session["uid"], 35)
-    else:
-        menu = []
+def manage_menus():
+    user_id = check_session(session, request)
+    page = render_template("manage.html")
 
-    return render_template("manage.html", menus=old_menus, menumeals=zip([i for i in range(7)], menu.meals))
+    if user_id:
+        menu = menu_service.fetch_menu(session["uid"])
+        older_menus = menu_service.fetch_old_menus(session["uid"], 35)
 
-@index_blueprint.route("/check_username", methods=["GET"])
-def testitee():
+        if isinstance(menu, str):
+            flash(menu)
 
-    if request.args.get("uname") == "vittuu" or request.args.get("uname") == "vittu2":
-        return "NOK"
-    else:
-        return "OK"
+            return page
+
+        if isinstance(older_menus, str):
+            page = render_template("manage.html", menu=zip(menu.meals, list(range(7))))
+
+        page = render_template("manage.html", old_menus=older_menus, menu=zip(menu.meals, list(range(7))))
+
+    return page
+
+@index_blueprint.route("/old_menus", methods=["GET"])
+def view_old_menus():
+    user_id = check_session(session, request)
+    page = render_template("old_menus.html")
+
+    if user_id:
+        menus = menu_service.fetch_old_menus(user_id)
+
+        if isinstance(menus, str):
+            flash(menus)
+
+            return page
+
+        if request.args:
+            selected_menu = menu_service.fetch_menu_by_timestamp(
+                                user_id,
+                                request.args.get("week"),
+                                request.args.get("year")
+                            )
+
+            if isinstance(selected_menu, str):
+                flash(selected_menu)
+
+                return render_template("old_menus.html", menus=menus)
+
+            return render_template(
+                "old_menus.html",
+                menus=menus,
+                timestamp=selected_menu.timestamp.isocalendar(),
+                selected_menu=zip(selected_menu.meals, list(range(7)))
+            )
+
+        page = render_template("old_menus.html", menus=menus)
+
+    return page
 
 @index_blueprint.context_processor
 def utilities():
-    return dict(today=datetime.today(), days=DAYS, day_numbers=[i for i in range(7)], qty_units=QTY_UNITS)
+    return dict(today=datetime.today(), days=DAYS, day_numbers=list(range(7)), qty_units=QTY_UNITS)
