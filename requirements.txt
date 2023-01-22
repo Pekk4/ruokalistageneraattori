@@ -33,6 +33,7 @@ python-dateutil==2.8.2
 python-dotenv==0.20.0
 six==1.16.0
 SQLAlchemy==1.4.34
+talisman==0.1.0
 tomli==2.0.1
 typing-extensions==4.1.1
 Werkzeug==2.1.1
