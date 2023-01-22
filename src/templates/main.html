@@ -4,11 +4,11 @@
                 <form id="login-form" action="/login" method="POST" class="text-center" style="display: none;" autocomplete="off">
                     <p class="my-1 py-1">
                         Tunnus:<br>
-                        <input id="username-field" type="text" name="username" class="border border-black rounded my-2">
+                        <input id="username-field" type="text" name="username" maxlength="16" class="border border-black rounded my-2">
                     </p>
                     <p class="my-1 py-1">
                         Salasana:<br>
-                        <input id="password-field" type="password" name="password" class="border border-black rounded my-2">
+                        <input id="password-field" type="password" name="password" maxlength="16" class="border border-black rounded my-2">
                     </p>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <p id="username-notification" class="font-semibold px-10 py-2 text-sm text-red-500" style="display: none;">
@@ -20,7 +20,7 @@
                     <p id="uname-free-notification" class="font-semibold px-10 py-2 text-sm text-red-500" style="display: none;">
                         Käyttäjätunnus on jo käytössä, valitse toinen
                     </p>
-                    <button id="login-box-button" class="bg-green-400 text-white font-bold my-3 py-2 px-4 border border-green-800 rounded" disabled>
+                    <button id="login-box-button" class="bg-green-400 text-white font-bold my-3 py-2 px-4 border border-green-800 rounded"><!--disabled>-->
                         Kirjaudu
                     </button>
                 </form>

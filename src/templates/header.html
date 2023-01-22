@@ -1,14 +1,14 @@
-<body class="bg-fixed bg-cover h-screen sm:overflow-hidden">
-      <div class="bg-gradient-to-b from-green-600/95 to-emerald-600/90 border-b-2 border-green-900/95  w-screen  grid grid-cols-1 sm:grid-cols-2">
+<body class="bg-fixed bg-cover h-screen asm:overflow-hidden">
+    <div class="bg-gradient-to-b from-green-600/95 to-emerald-600/90 border-b-2 border-green-900/95  w-screen  grid grid-cols-1 sm:grid-cols-2">
         <div class="flex items-center justify-center">
-          <p class="font-bold text-white text-lg text-shadow-sm-black">Ruokalistageneraattori</p>
+            <p class="font-bold text-white text-lg text-shadow-sm-black">Ruokalistageneraattori</p>
         </div>
         <div class="flex flex-col sm:flex-row justify-center items-center">
-          <div onclick="location.replace('/')" class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black">Etusivu</div>
-          <div onclick="location.replace('/manage')" class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black">Ruokalistat</div>
-          <div onclick="location.replace('/meals')" class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black">Ruokalajit</div>
-          <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black">Reseptit</div>
-          <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black">Muut</div>
-          <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="/logout">Kirjaudu {% if session.username %}ulos{% else %}sisään{% endif %}</a></div>
+            <div onclick="location.replace('/')" class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black">Etusivu</div>
+            <div onclick="location.replace('/manage')" class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black">Ruokalistat</div>
+            <div onclick="location.replace('/meals')" class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black">Ruokalajit</div>
+            <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black">Reseptit</div>
+            <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black">Muut</div>
+            <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black  sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="/logout">Kirjaudu {% if session.username %}ulos{% else %}sisään{% endif %}</a></div>
         </div>
-      </div>
+    </div>
