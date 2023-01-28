@@ -1,9 +1,11 @@
 import re
 
-from argon2 import PasswordHasher, exceptions
+from argon2 import PasswordHasher
+from argon2.exceptions import HashingError, VerifyMismatchError
 
 from entities.errors import InsertingError, InvalidInputError, ReadDatabaseError
 from repositories.user_repository import UserRepository as default_repository
+from utilities import MESSAGES
 
 
 class UserService:
@@ -21,34 +23,34 @@ class UserService:
             self.user_repository.add_user(username, hash_value)
         except InvalidInputError as error:
             return str(error)
-        except (InsertingError, exceptions.HashingError):
-            return "Jotain meni valitettavasti pieleen, yritä uudestaan. \N{crying face}"
+        except (InsertingError, HashingError):
+            return MESSAGES["common_error"]
 
     def login_user(self, username, password):
         try:
             user = self.user_repository.find_single_user(username)
 
             if not user:
-                return "Käyttäjätunnusta ei löydy, tarkista kirjoitusasu. \N{crying face}"
+                return MESSAGES["no_user"]
 
             self.password_hasher.verify(user[0].password, password)
 
             return (user[0].username, user[0].id)
 
-        except exceptions.VerifyMismatchError:
-            return "Väärä salasana, yritä uudestaan. \N{face with monocle}"
+        except VerifyMismatchError:
+            return MESSAGES["wrong_pass"]
         except ReadDatabaseError:
-            return "Jotain meni valitettavasti pieleen, yritä uudestaan. \N{crying face}"
+            return MESSAGES["common_error"]
 
 
     @staticmethod
     def _validate_username(username):
         if len(username.strip()) < 5 or len(username) > 16:
-            raise InvalidInputError("Käyttäjänimi ei ole kelvollinen, noudata annettuja ohjeita! \N{angry face}")
+            raise InvalidInputError(MESSAGES["invalid_pass"])
     
     @staticmethod
     def _validate_password(password):
         if (len(password.strip()) < 8 or not re.match(".*[\d]+", password) or
             not re.match(".*[\W_]+", password)):
 
-            raise InvalidInputError("Salasana ei ole kelvollinen, noudata annettuja ohjeita! \N{angry face}")
+            raise InvalidInputError(MESSAGES["invalid_uname"])

@@ -1,9 +1,9 @@
 from entities.ingredient import Ingredient
 from entities.meal import Meal
-
 from repositories.meal_repository import MealRepository as default_repository
-from entities.errors import InsertingError, InvalidInputError, MealExistsWarning, NoResultsWarning, NotEnoughMealsError, ReadDatabaseError
-
+from utils.errors import (InsertingError, InvalidInputError, MealExistsWarning, NoResultsWarning,
+    NotEnoughMealsError, ReadDatabaseError)
+from utilities import MESSAGES
 
 class MealService:
     def __init__(self, repository=default_repository()):
@@ -13,9 +13,9 @@ class MealService:
         try:
             meals = self.repository.find_all_meals(user_id)
         except NoResultsWarning:
-            return [] #NÄMÄ UUSIKSI
+            return MESSAGES["no_meals"]
         except ReadDatabaseError:
-            return "Jotain meni valitettavasti pieleen, yritä uudestaan. \N{crying face}"
+            return MESSAGES["common_error"]
 
         return meals
 
@@ -23,9 +23,9 @@ class MealService:
         try:
             ingredients = self.repository.find_all_ingredients(user_id)
         except NoResultsWarning:
-            return [] #NÄMÄ UUSIKSI, VIEW HOITAA 
+            return []
         except ReadDatabaseError:
-            return "Jotain meni valitettavasti pieleen, yritä uudestaan. \N{crying face}"
+            return MESSAGES["common_error"]
 
         return ingredients
 
@@ -33,9 +33,9 @@ class MealService:
         try:
             meal = self.repository.find_single_meal(user_id, meal_id=meal_id)
         except NoResultsWarning:
-            return []
+            return MESSAGES["no_meals"]
         except (ValueError, ReadDatabaseError):
-            return False ### VIESTIÄ
+            return MESSAGES["common_error"]
 
         return meal
 
@@ -47,17 +47,17 @@ class MealService:
 
             self.repository.insert_meal_ingredients(meal, user_id)
         except (InsertingError, KeyError):
-            return "Jotain meni valitettavasti pieleen, yritä uudestaan. \N{crying face}"
+            return MESSAGES["common_error"]
         except InvalidInputError:
-            return "Tyhjät merkkijonot niminä eivät ole sallittuja. \N{angry face}"
+            return MESSAGES["input_error"]
         except MealExistsWarning:
-            return "Samanniminen ruokalaji löytyy jo kirjastostasi, haluatko päivittää sen antamillasi tiedoilla?"
+            return MESSAGES["meal_exists"]
 
         return True
 
     def update_meal(self, user_id, input_data, meal_id=None, meal_name=None):
         if not meal_id and not meal_name:
-            raise ValueError("Meal id or name needed for updating meal.")
+            return MESSAGES["common_error"]
 
         try:
             new_meal = self._prepare_meal(input_data)
@@ -66,8 +66,10 @@ class MealService:
                 existing_meal = self.repository.find_single_meal(user_id, meal_id=meal_id)
             if meal_name:
                 existing_meal = self.repository.find_single_meal(user_id, meal_name=meal_name)
-        except (InvalidInputError, KeyError, ReadDatabaseError, NoResultsWarning):
-            return "Jotain meni valitettavasti pieleen, yritä uudestaan. \N{crying face}"
+        except InvalidInputError:
+            MESSAGES["input_error"]
+        except (KeyError, ReadDatabaseError, NoResultsWarning):
+            MESSAGES["common_error"]
 
         if new_meal != existing_meal:
             try:
@@ -76,7 +78,7 @@ class MealService:
 
                 self.repository.insert_meal_ingredients(meal_to_process, user_id)
             except InsertingError:
-                return "Jotain meni valitettavasti pieleen, yritä uudestaan. \N{crying face}"
+                return MESSAGES["common_error"]
 
         return True
 
@@ -88,7 +90,7 @@ class MealService:
             if int(meal_id) == meal_from_db.db_id:
                 self.repository.delete_meal(user_id, meal_id)
         except (KeyError, ReadDatabaseError, InsertingError, NoResultsWarning):
-            return "Jotain meni valitettavasti pieleen, yritä uudestaan. \N{crying face}"
+            return MESSAGES["common_error"]
 
     def _prepare_meal(self, meal_data):
         try:
