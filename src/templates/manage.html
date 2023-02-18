@@ -36,12 +36,16 @@
             </div>
             <div id="current-menu-content">
                 <div id="meals-of-week" class="grid grid-cols-7 text-center border-b rounded-b border-t border-l border-black rounded-t">
-                    {% for meal, day in menu -%}
-                    <div id="single-meal-div-{{ day }}" class="single-meal w-[180px] break-words p-3 border-r border-black {% if day == 0 %}rounded-tl rounded-bl{% elif day == 6 %}rounded-tr rounded-br{% endif %} {% if today.isocalendar()[2]-1 == day %}bg-orange-400{% else %}bg-orange-100{% endif %} hover:bg-white">
-                        <p class="p-1 font-semibold">{{ days[day] }}:</p>
-                        <p id="meal-name-{{ day }}" class="p-1">{{ meal }}</p>
-                    </div>
-                    {%- endfor %}
+                    {% if meal -%}
+                        {% for meal, day in menu -%}
+                        <div id="single-meal-div-{{ day }}" class="single-meal w-[180px] break-words p-3 border-r border-black {% if day == 0 %}rounded-tl rounded-bl{% elif day == 6 %}rounded-tr rounded-br{% endif %} {% if today.isocalendar()[2]-1 == day %}bg-orange-400{% else %}bg-orange-100{% endif %} hover:bg-white">
+                            <p class="p-1 font-semibold">{{ days[day] }}:</p>
+                            <p id="meal-name-{{ day }}" class="p-1">{{ meal }}</p>
+                        </div>
+                        {%- endfor %}
+                    {% else %}
+                        <div>Ei vielä ruokalistaa. 😢</div><!--!!!!!! TEE TÄLLE JOTAIN!!!!!-->
+                    {% endif %}
                 </div>
                 <div id="edit-menu-buttons" class="hidden border-b border-l border-black grid-cols-7 rounded-b">
                     {% for day in day_numbers -%}

@@ -3,7 +3,7 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from repositories.io import InputOutput as default_io
 from entities.meal import Meal
 from entities.ingredient import Ingredient
-from entities.errors import InsertingError, MealExistsWarning, ReadDatabaseError, NoResultsWarning
+from utils.errors import InsertingError, MealExistsWarning, ReadDatabaseError, NoResultsWarning
 
 
 class MealRepository():
@@ -15,7 +15,7 @@ class MealRepository():
             SELECT m.id AS meal_id, m.name AS meal_name, json_agg(json_build_object('ingredient_id',
             i.id, 'ingredient_name', i.name, 'quantity', n.quantity, 'qty_unit', n.qty_unit))
             AS ingredients FROM meals m LEFT JOIN meal_ingredients n ON m.id = n.meal_id
-            LEFT JOIN ingredients i ON n.ingredient_id = i.id WHERE m.user_id = 1 GROUP BY m.id;"""
+            LEFT JOIN ingredients i ON n.ingredient_id = i.id WHERE m.user_id = :user_id GROUP BY m.id;"""
 
         parameters = {"user_id":user_id}
 

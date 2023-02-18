@@ -34,7 +34,7 @@ MESSAGES = {
         "<br>Lisää ensin ruokalajeja kirjastoosi generoidaksesi niistä ruokalistan.",
     "common_error":
         "Jotain meni valitettavasti pieleen. \N{crying face}<br>" \
-        "Yritä hetken päästä uudestaan, tai ota yhteyttä ylläpitoon.",
+        "<br>Yritä hetken päästä uudestaan, tai ota yhteyttä ylläpitoon.",
     "input_error":
         "Tyhjät merkkijonot niminä eivät ole sallittuja. \N{angry face}",
     "meal_exists":

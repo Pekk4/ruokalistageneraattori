@@ -21,9 +21,9 @@ def index():
         menu = menu_service.fetch_menu(user_id)
 
         if isinstance(menu, str):
-            flash(menu)
-        else:
-            page = render_template("index.html", menu=zip(menu.meals, list(range(7))))
+            return render_template("index.html", message=menu)
+
+        page = render_template("index.html", menu=menu)
 
     return page
 
@@ -53,12 +53,15 @@ def view_meals():
         ingredients = meal_service.fetch_user_ingredients(user_id)
 
         if isinstance(meals, str):
-            flash(meals)
-
-            return page
+            return render_template("meal.html", message=meals)
 
         if "new" in request.args:
-            return render_template("meal.html", insert_mode=True, meals=meals, ingredients=ingredients)
+            return render_template(
+                "meal.html",
+                insert_mode=True,
+                meals=meals,
+                ingredients=ingredients
+            )
 
         page = render_template("meal.html", meals=meals, ingredients=ingredients)
 
@@ -78,14 +81,9 @@ def view_meal(meal_id=None):
             ingredients = meal_service.fetch_user_ingredients(user_id)
 
             if isinstance(meal, str):
-                flash(meal)
-
-                return page
-
+                return render_template("meal.html", message=meal)
             if isinstance(meals, str):
-                flash(meals)
-
-                return page
+                return render_template("meal.html", message=meals)
 
             page = render_template("meal.html", meal=meal, meals=meals, ingredients=ingredients)
 
@@ -99,18 +97,15 @@ def manage_menus():
     page = render_template("manage.html")
 
     if user_id:
-        menu = menu_service.fetch_menu(session["uid"])
-        older_menus = menu_service.fetch_old_menus(session["uid"], 35)
+        menu = menu_service.fetch_menu(user_id)
+        older_menus = menu_service.fetch_old_menus(user_id, 35)
 
         if isinstance(menu, str):
-            flash(menu)
-
-            return page
-
+            return render_template("manage.html", message=menu)
         if isinstance(older_menus, str):
-            page = render_template("manage.html", menu=zip(menu.meals, list(range(7))))
+            return render_template("manage.html", message=older_menus)
 
-        page = render_template("manage.html", old_menus=older_menus, menu=zip(menu.meals, list(range(7))))
+        page = render_template("manage.html", old_menus=older_menus, menu=menu)
 
     return page
 
@@ -123,27 +118,25 @@ def view_old_menus():
         menus = menu_service.fetch_old_menus(user_id)
 
         if isinstance(menus, str):
-            flash(menus)
-
-            return page
+            return render_template("old_menus.html", message=menus)
 
         if request.args:
-            selected_menu = menu_service.fetch_menu_by_timestamp(
-                                user_id,
-                                request.args.get("week"),
-                                request.args.get("year")
-                            )
+            selected_menu = (
+                menu_service.fetch_menu_by_timestamp(
+                    user_id,
+                    request.args.get("week"),
+                    request.args.get("year")
+                )
+            )
 
             if isinstance(selected_menu, str):
-                flash(selected_menu)
-
-                return render_template("old_menus.html", menus=menus)
+                return render_template("old_menus.html", message=selected_menu, menus=menus)
 
             return render_template(
                 "old_menus.html",
                 menus=menus,
                 timestamp=selected_menu.timestamp.isocalendar(),
-                selected_menu=zip(selected_menu.meals, list(range(7)))
+                selected_menu=selected_menu.meals
             )
 
         page = render_template("old_menus.html", menus=menus)

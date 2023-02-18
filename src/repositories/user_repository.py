@@ -1,7 +1,7 @@
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from repositories.io import InputOutput as default_io
-from entities.errors import InsertingError, ReadDatabaseError
+from utils.errors import InsertingError, ReadDatabaseError
 
 
 class UserRepository():

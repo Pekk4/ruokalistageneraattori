@@ -3,7 +3,7 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from entities.ingredient import Ingredient
 from entities.meal import Meal
 from entities.menu import Menu
-from entities.errors import InsertingError, NotEnoughMealsError, ReadDatabaseError
+from utils.errors import InsertingError, NoResultsWarning, ReadDatabaseError
 from repositories.io import InputOutput as default_io
 
 
@@ -60,7 +60,7 @@ class MenuRepository():
             raise ReadDatabaseError
 
         if not results:
-            raise NotEnoughMealsError("Not enough meals for menu.")
+            raise NoResultsWarning
 
         return self._build_menu_with_ingredients(results)
 
@@ -96,7 +96,7 @@ class MenuRepository():
             raise ReadDatabaseError
 
         if not results:
-            raise NotEnoughMealsError("Not enough meals for menu.")
+            raise NoResultsWarning
 
         menus = []
         rows = []
@@ -126,7 +126,7 @@ class MenuRepository():
             raise ReadDatabaseError
 
         if not results:
-            raise NotEnoughMealsError("Not enough meals for menu.")
+            raise NoResultsWarning
 
         return self._build_menu_without_ingredients(results)
 

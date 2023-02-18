@@ -2,7 +2,7 @@ from random import randint, shuffle
 from datetime import datetime
 
 from entities.menu import Menu
-from entities.errors import NotEnoughMealsError
+from utils.errors import NotEnoughMealsError, NoResultsWarning
 from repositories.meal_repository import MealRepository as default_repository
 
 
@@ -12,7 +12,10 @@ class GeneratorService:
 
     def generate_menu(self, user_id):
         generated_menu = []
-        meals = self.repository.find_all_meals(user_id)
+        try:
+            meals = self.repository.find_all_meals(user_id)
+        except NoResultsWarning:
+            raise NotEnoughMealsError
 
         if len(meals) < 7:
             raise NotEnoughMealsError("Not enough meals in the database")

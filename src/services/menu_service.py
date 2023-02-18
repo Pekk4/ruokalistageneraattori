@@ -2,21 +2,25 @@ from datetime import datetime
 
 from services.generator import GeneratorService
 from repositories.menu_repository import MenuRepository as default_repository
-from entities.errors import InsertingError, InvalidInputError, MealExistsWarning, NoResultsWarning, NotEnoughMealsError, ReadDatabaseError
+from utils.errors import InsertingError, NotEnoughMealsError, ReadDatabaseError, NoResultsWarning
 from entities.menu import Menu
-from utilities import DAYS, MESSAGES, validate_week_number, validate_year
+from utilities import MESSAGES, validate_week_number, validate_year
 
 
 class MenuService:
     def __init__(self, repository=default_repository(), generator=GeneratorService()):
         self.repository = repository
         self.generator = generator
+        self.week_day_indexes = list(range(7))
 
     def fetch_menu(self, user_id):
         try:
             menu = self.repository.fetch_current_menu(user_id)
-        except NotEnoughMealsError:
-            return MESSAGES["not_enough"]
+
+            if isinstance(menu, Menu):
+                menu = zip(menu.meals, self.week_day_indexes)
+        except NoResultsWarning:
+            return []
         except ReadDatabaseError:
             return MESSAGES["common_error"]
 
@@ -26,16 +30,16 @@ class MenuService:
         try:
             menu = self.generator.generate_menu(user_id)
             self.repository.upsert_menu(menu, user_id)
-        except NotEnoughMealsError:
+        except (NotEnoughMealsError, NoResultsWarning):
             return MESSAGES["not_enough"]
-        except InsertingError:
+        except (InsertingError, ReadDatabaseError):
             return MESSAGES["common_error"]
 
     def generate_meal(self, user_id):
         try:
             menu = self.repository.fetch_current_menu(user_id)
             meal = self.generator.generate_meal(user_id, menu)
-        except NotEnoughMealsError:
+        except (NotEnoughMealsError, NoResultsWarning):
             return MESSAGES["not_enough"]
         except (ValueError, ReadDatabaseError):
             return MESSAGES["common_error"]
@@ -54,8 +58,8 @@ class MenuService:
     def fetch_old_menus(self, user_id: int, limit_rows: int=False):
         try:
             menus = self.repository.fetch_old_menus(user_id, limit_rows)
-        except NotEnoughMealsError:
-            return MESSAGES["not_enough"]
+        except NoResultsWarning:
+            return []
         except ReadDatabaseError:
             return MESSAGES["common_error"]
 
@@ -70,10 +74,11 @@ class MenuService:
             validate_year(year)
 
             menu = self.repository.fetch_menu_by_year_and_week(user_id, year, week_number)
-        except (TypeError, ValueError, ReadDatabaseError):
+
+            if isinstance(menu, Menu):
+                menu.meals = zip(menu.meals, self.week_day_indexes)
+        except (TypeError, ValueError, ReadDatabaseError, NoResultsWarning):
             return MESSAGES["common_error"]
-        except NotEnoughMealsError:
-            return MESSAGES["not_enough"]
 
         return menu
 

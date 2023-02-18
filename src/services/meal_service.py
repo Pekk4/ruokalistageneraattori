@@ -2,7 +2,7 @@ from entities.ingredient import Ingredient
 from entities.meal import Meal
 from repositories.meal_repository import MealRepository as default_repository
 from utils.errors import (InsertingError, InvalidInputError, MealExistsWarning, NoResultsWarning,
-    NotEnoughMealsError, ReadDatabaseError)
+    ReadDatabaseError)
 from utilities import MESSAGES
 
 class MealService:
@@ -22,10 +22,8 @@ class MealService:
     def fetch_user_ingredients(self, user_id):
         try:
             ingredients = self.repository.find_all_ingredients(user_id)
-        except NoResultsWarning:
+        except (NoResultsWarning, ReadDatabaseError):
             return []
-        except ReadDatabaseError:
-            return MESSAGES["common_error"]
 
         return ingredients
 

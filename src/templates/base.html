@@ -35,9 +35,13 @@
         {%- endif -%}
         {% include "modal.html" %}
         {%- with messages = get_flashed_messages() %}
-            {%- if messages %}
-            <script>activateNotifyModal("{{ messages[-1] }}", true);</script>
-            {%- endif %}
+            {%- autoescape false %}
+                {%- if message %}
+                <script>activateNotifyModal("{{ message }}", true);</script>
+                {%- elif messages %}
+                <script>activateNotifyModal("{{ messages[0] }}", true);</script>
+                {%- endif %}
+            {%- endautoescape %}
         {%- endwith %}
     </body>
 </html>
