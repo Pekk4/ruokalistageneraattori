@@ -35,20 +35,17 @@
                 </button>
             </div>
             <div id="current-menu-content">
+                {%- if menu %}
                 <div id="meals-of-week" class="grid grid-cols-7 text-center border-b rounded-b border-t border-l border-black rounded-t">
-                    {% if meal -%}
-                        {% for meal, day in menu -%}
-                        <div id="single-meal-div-{{ day }}" class="single-meal w-[180px] break-words p-3 border-r border-black {% if day == 0 %}rounded-tl rounded-bl{% elif day == 6 %}rounded-tr rounded-br{% endif %} {% if today.isocalendar()[2]-1 == day %}bg-orange-400{% else %}bg-orange-100{% endif %} hover:bg-white">
-                            <p class="p-1 font-semibold">{{ days[day] }}:</p>
-                            <p id="meal-name-{{ day }}" class="p-1">{{ meal }}</p>
-                        </div>
-                        {%- endfor %}
-                    {% else %}
-                        <div>Ei vielä ruokalistaa. 😢</div><!--!!!!!! TEE TÄLLE JOTAIN!!!!!-->
-                    {% endif %}
+                    {% for meal, day in menu -%}
+                    <div id="single-meal-div-{{ day }}" class="single-meal w-[180px] break-words p-3 border-r border-black {% if day == 0 %}rounded-tl rounded-bl{% elif day == 6 %}rounded-tr rounded-br{% endif %} {% if today.isocalendar()[2]-1 == day %}bg-orange-400{% else %}bg-orange-100{% endif %} hover:bg-white">
+                        <p class="p-1 font-semibold">{{ days[day] }}:</p>
+                        <p id="meal-name-{{ day }}" class="p-1">{{ meal }}</p>
+                    </div>
+                    {% endfor %}
                 </div>
                 <div id="edit-menu-buttons" class="hidden border-b border-l border-black grid-cols-7 rounded-b">
-                    {% for day in day_numbers -%}
+                    {%- for day in day_numbers %}
                     <div id="form-div-{{ day }}" class="form-div border-r border-black text-center {% if today.isocalendar()[2]-1 == day %}bg-orange-400{% else %}bg-orange-100{% endif %} {% if day == 0 %}rounded-bl{% elif day == 6 %}rounded-br{% endif %}">
                         <button class="bg-green-600 hover:bg-green-700 text-white font-bold my-5 py-2 px-4 border border-green-800 rounded" onclick="editMeal({{ day }})">
                             Vaihda
@@ -56,13 +53,22 @@
                     </div>
                     {%- endfor %}
                 </div>
+                {%- else %}
+                <div class="text-center border border-black rounded bg-orange-100 p-6">
+                    <p class="m-1">Ei vielä ruokalistaa. 😢</p>
+                    <p class="m-1">Generoi uusi ruokalista, tai käy lisäämässä ruokalajeja generoidaksesi niistä listan.</p>
+                </div>
+                {%- endif %}
             </div>
             <div id="buttons" class="flex flex-row items-center m-12">
-                <button id="start-editing-button" onclick="editMenu()" class="m-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 border border-green-800 rounded">
+                <button id="start-editing-button" {% if menu %} onClick="editMenu()" {% else %} onClick="activateNotifyModal('Generoi ensin ruokalista muokataksesi sitä.')" {% endif %} class="m-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 border border-green-800 rounded">
                     Muokkaa ruokalistaa
                 </button>
                 <button onclick="location.replace('/generate')" class="m-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 border border-green-800 rounded">
                     Generoi uusi ruokalista
+                </button>
+                <button onclick="location.replace('/meals')" class="m-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 border border-green-800 rounded">
+                    Lisää ruokalajeja
                 </button>
                 <button onclick="null" class="m-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 border border-green-800 rounded">
                     Kerää ostoslista
