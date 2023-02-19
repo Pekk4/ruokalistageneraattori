@@ -51,7 +51,7 @@ class MenuRepository():
             ON e.id = n.meal_id LEFT JOIN ingredients i ON n.ingredient_id = i.id WHERE
             m.user_id = :user_id AND DATE_PART('week', m.timestamp) = DATE_PART('week', NOW()) AND
             DATE_PART('year', m.timestamp) = DATE_PART('year', NOW())
-            GROUP BY r.day_of_week, m.id, e.id"""
+            GROUP BY r.day_of_week, m.id, e.id ORDER BY r.day_of_week"""
         parameters = {"user_id": user_id}
 
         try:

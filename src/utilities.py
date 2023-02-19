@@ -42,7 +42,7 @@ MESSAGES = {
         "haluatko päivittää sen antamillasi tiedoilla?",
     "not_enough":
         "Kirjastossasi ei ole tarpeeksi ruokalajeja ruokalistan luomiseksi." \
-        "Lisää ensin ruokalajeja kirjastoosi.",
+        "<br>Lisää ensin ruokalajeja kirjastoosi.",
     "no_user":
         "Käyttäjätunnusta ei löydy, tarkista kirjoitusasu. \N{crying face}",
     "wrong_pass":

@@ -11,6 +11,7 @@ from utilities import DAYS, QTY_UNITS, check_session
 index_blueprint = Blueprint("index_blueprint", __name__)
 meal_service = MealService()
 menu_service = MenuService()
+day_indexes = list(range(7))
 
 @index_blueprint.route("/")
 def index():
@@ -22,8 +23,10 @@ def index():
 
         if isinstance(menu, str):
             return render_template("index.html", message=menu)
+        if isinstance(menu, list):
+            return render_template("index.html", menu=menu)
 
-        page = render_template("index.html", menu=menu)
+        page = render_template("index.html", menu=zip(menu.meals, day_indexes))
 
     return page
 
@@ -104,8 +107,16 @@ def manage_menus():
             return render_template("manage.html", message=menu)
         if isinstance(older_menus, str):
             return render_template("manage.html", message=older_menus)
+        if isinstance(menu, list):
+            return render_template("manage.html", older_menus=older_menus, menu=menu)
 
-        page = render_template("manage.html", old_menus=older_menus, menu=menu)
+        page = (
+            render_template(
+                "manage.html",
+                old_menus=older_menus,
+                menu=zip(menu.meals, day_indexes)
+            )
+        )
 
     return page
 
@@ -136,7 +147,7 @@ def view_old_menus():
                 "old_menus.html",
                 menus=menus,
                 timestamp=selected_menu.timestamp.isocalendar(),
-                selected_menu=selected_menu.meals
+                selected_menu=zip(selected_menu.meals, day_indexes)
             )
 
         page = render_template("old_menus.html", menus=menus)

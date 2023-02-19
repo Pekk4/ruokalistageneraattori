@@ -11,14 +11,10 @@ class MenuService:
     def __init__(self, repository=default_repository(), generator=GeneratorService()):
         self.repository = repository
         self.generator = generator
-        self.week_day_indexes = list(range(7))
 
     def fetch_menu(self, user_id):
         try:
             menu = self.repository.fetch_current_menu(user_id)
-
-            if isinstance(menu, Menu):
-                menu = zip(menu.meals, self.week_day_indexes)
         except NoResultsWarning:
             return []
         except ReadDatabaseError:
@@ -75,8 +71,6 @@ class MenuService:
 
             menu = self.repository.fetch_menu_by_year_and_week(user_id, year, week_number)
 
-            if isinstance(menu, Menu):
-                menu.meals = zip(menu.meals, self.week_day_indexes)
         except (TypeError, ValueError, ReadDatabaseError, NoResultsWarning):
             return MESSAGES["common_error"]
 
