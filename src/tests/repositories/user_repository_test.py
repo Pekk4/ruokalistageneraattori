@@ -1,8 +1,10 @@
 import unittest
 from unittest.mock import patch
 
+from sqlalchemy.exc import SQLAlchemyError
+
 from repositories.user_repository import UserRepository
-from entities.errors import InsertingError
+from entities.errors import InsertingError, ReadDatabaseError
 
 
 class TestUserRepository(unittest.TestCase):
@@ -36,6 +38,13 @@ class TestUserRepository(unittest.TestCase):
         self.assertEqual(len(return_value), 0)
         self.assertIsInstance(return_value, list)
 
+    @patch("repositories.io.InputOutput.read")
+    def test_find_single_user_raises_exception(self, read_mock):
+        read_mock.side_effect = SQLAlchemyError("No db connection")
+
+        with self.assertRaises(ReadDatabaseError):
+            self.repository.find_single_user("Teppo")
+
     @patch("repositories.io.InputOutput.write")
     def test_add_user_calls_write_method(self, write_mock):
         self.repository.add_user(self.parameters["username"], self.parameters["password"])
@@ -43,16 +52,21 @@ class TestUserRepository(unittest.TestCase):
         write_mock.assert_called_with(self.insert_query, self.parameters)
 
     @patch("repositories.io.InputOutput.write")
-    def test_add_user_raises_exception(self, write_mock):
+    def test_add_user_raises_exception_when_db_exception(self, write_mock):
+        write_mock.side_effect = SQLAlchemyError
+        error_text = "A technical error occurred during inserting user, please contact admin."
+
+        with self.assertRaises(InsertingError) as error:
+            self.repository.add_user(self.parameters["username"], self.parameters["password"])
+
+        self.assertEqual(str(error.exception), error_text)
+
+    @patch("repositories.io.InputOutput.write")
+    def test_add_user_raises_exception_when_no_results(self, write_mock):
         write_mock.return_value = False
 
         with self.assertRaises(InsertingError) as error:
             self.repository.add_user(self.parameters["username"], self.parameters["password"])
 
-        self.assertEqual(str(error.exception), "An error occurred during inserting user, aborted.")
-
-    @patch("repositories.io.InputOutput.write")
-    def test_add_user_returns_correct(self, write_mock):
-        write_mock.return_value = True
-
-        self.assertTrue(self.repository.add_user(self.parameters["username"], self.parameters["password"]))
+        error_text = "A technical error occurred during inserting user, please contact admin."
+        self.assertEqual(str(error.exception), error_text)

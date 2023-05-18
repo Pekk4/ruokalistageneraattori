@@ -1,9 +1,10 @@
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+
 from repositories.io import InputOutput as default_io
-from entities.errors import InsertingError
+from utils.errors import InsertingError, ReadDatabaseError
 
 
 class UserRepository():
-
     def __init__(self, database_io=default_io()):
         self.db_io = database_io
 
@@ -11,13 +12,19 @@ class UserRepository():
         query = "SELECT id, username, password FROM users WHERE username = :username"
         parameters = {"username":username}
 
-        return self.db_io.read(query, parameters)
+        try:
+            return self.db_io.read(query, parameters)
+        except SQLAlchemyError:
+            raise ReadDatabaseError
 
     def add_user(self, username, password):
         query = "INSERT INTO users (username, password) VALUES (:username, :password)"
         parameters = {"username":username, "password":password}
 
-        if not self.db_io.write(query, parameters):
+        try:
+            return_value = self.db_io.write(query, parameters)
+        except (IntegrityError, SQLAlchemyError):
             raise InsertingError("user")
 
-        return True # Necessary?
+        if not return_value:
+            raise InsertingError("user")

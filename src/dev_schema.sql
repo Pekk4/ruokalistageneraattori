@@ -1,0 +1,40 @@
+CREATE TABLE users (id SERIAL PRIMARY KEY, username TEXT UNIQUE NOT NULL, password VARCHAR(100) NOT NULL);
+
+CREATE TABLE meals (id SERIAL PRIMARY KEY, name TEXT, user_id INTEGER REFERENCES users);
+
+CREATE TABLE ingredients (id SERIAL PRIMARY KEY, name TEXT, user_id INTEGER REFERENCES users);
+
+CREATE TABLE menus (id SERIAL PRIMARY KEY, user_id INTEGER REFERENCES users, timestamp TIMESTAMP);
+
+CREATE TABLE menu_meals (menu_id INTEGER REFERENCES menus, meal_id INTEGER REFERENCES meals ON DELETE SET NULL, day_of_week INTEGER);
+
+CREATE TABLE meal_ingredients (meal_id INTEGER REFERENCES meals ON DELETE CASCADE, ingredient_id INTEGER REFERENCES ingredients, quantity TEXT, qty_unit TEXT);
+
+CREATE TABLE recipes (id SERIAL PRIMARY KEY, meal_id INTEGER REFERENCES meals ON DELETE CASCADE,  name TEXT, recipe TEXT);
+
+
+
+CREATE UNIQUE INDEX unique_menus_per_week_for_user ON menus (user_id, DATE_PART('week', timestamp), DATE_PART('year', timestamp));
+CREATE UNIQUE INDEX unique_ingredients_for_user ON ingredients (name, user_id);
+CREATE UNIQUE INDEX unique_meals_for_user ON meals (name, user_id);
+CREATE UNIQUE INDEX unique_meal_ingredients_for_user ON meal_ingredients (meal_id, ingredient_id);
+
+INSERT INTO users (username, password) VALUES ('vittu', '$argon2id$v=19$m=65536,t=3,p=4$WqFHLrtA3ZXPTXLH+ZgeQA$n0fh2jqhHkI18Nfgld7jJsWobv2qoHV4TjVgmqTsYMg');
+
+CREATE FUNCTION after_delete()
+  RETURNS trigger AS
+$$
+BEGIN
+IF NOT EXISTS(SELECT 1 FROM meal_ingredients WHERE ingredient_id = OLD.ingredient_id) THEN
+    DELETE FROM ingredients WHERE id = OLD.ingredient_id;
+END IF;
+RETURN OLD;
+END;
+
+$$
+LANGUAGE 'plpgsql';
+
+CREATE TRIGGER delete_ingredient_when_no_more_references
+    AFTER DELETE ON meal_ingredients
+    FOR EACH ROW
+    EXECUTE PROCEDURE after_delete();

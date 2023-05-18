@@ -11,3 +11,8 @@ htmlcov
 *.swp
 test.py
 logs/*
+old_shit/
+docs/
+*ocker*
+*.tar*
+package-lock.json

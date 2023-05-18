@@ -1,10 +1,9 @@
-from flask import redirect, render_template, Blueprint, request, session
-from secrets import token_hex
+from flask import redirect, Blueprint, request, session, flash
 
-from services.service import Service
+from services.user_service import UserService
 
 
-service = Service()
+service = UserService()
 users_blueprint = Blueprint("login_blueprint", __name__)
 
 @users_blueprint.route("/login", methods=["POST"])
@@ -14,20 +13,21 @@ def login():
 
     user = service.login_user(username, password)
 
-    if user:
+    if isinstance(user, tuple):
         (uname, uid) = user
 
         session["username"] = uname
         session["uid"] = uid
-        session["token"] = token_hex(32)
+        session["uagent"] = request.user_agent.string
+        session["remote_addr"] = request.remote_addr
+    else:
+        flash(user)
 
     return redirect("/")
 
 @users_blueprint.route("/logout")
 def logout():
-    del session["username"]
-    del session["uid"]
-    del session["token"]
+    session.clear()
 
     return redirect("/")
 
@@ -36,14 +36,9 @@ def register():
     username = request.form["username"]
     password = request.form["password"]
 
-    service.insert_new_user(username, password)
+    message = service.insert_new_user(username, password)
+
+    if message:
+        flash(message)
 
     return redirect("/")
-
-@users_blueprint.route("/login_page")
-def login_page():
-    return render_template("login.html")
-
-@users_blueprint.route("/register_page")
-def register_page():
-    return render_template("register.html")
