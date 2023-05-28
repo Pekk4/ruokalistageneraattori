@@ -4,6 +4,7 @@ from talisman import Talisman
 
 from config import DATABASE_URL, SECRET_KEY, CSP
 from database import database
+from blueprints.admin import admin_blueprint
 from blueprints.index import index_blueprint
 from blueprints.users import users_blueprint
 from blueprints.interfaces import interfaces_blueprint
@@ -24,6 +25,7 @@ csrf = CSRFProtect()
 csrf.init_app(app)
 database.init_app(app)
 
+app.register_blueprint(admin_blueprint)
 app.register_blueprint(index_blueprint)
 app.register_blueprint(users_blueprint)
 app.register_blueprint(interfaces_blueprint)

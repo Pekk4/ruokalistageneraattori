@@ -1,5 +1,6 @@
 from flask import redirect, Blueprint, request, session, flash
 
+from config import ADMIN_NAME
 from services.user_service import UserService
 
 
@@ -22,6 +23,8 @@ def login():
         session["remote_addr"] = request.remote_addr
     else:
         flash(user)
+
+    return redirect("/admin") if user[0] == ADMIN_NAME else redirect("/")
 
     return redirect("/")
 
