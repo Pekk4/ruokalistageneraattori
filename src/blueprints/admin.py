@@ -17,3 +17,14 @@ def admin():
         return render_template("logs.html", logs=logs, paska=True)
     
     return render_template("index.html")
+
+@admin_blueprint.route("/users")
+def users():
+    user_id = check_session(session, request)
+
+    if user_id and user_id == 1:
+        users = admin_service.get_users()
+
+        return render_template("users.html", users=users)
+
+    return render_template("index.html")

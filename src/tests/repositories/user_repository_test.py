@@ -4,7 +4,8 @@ from unittest.mock import patch
 from sqlalchemy.exc import SQLAlchemyError
 
 from repositories.user_repository import UserRepository
-from entities.errors import InsertingError, ReadDatabaseError
+from utils.errors import InsertingError, ReadDatabaseError
+from entities.user import User
 
 
 class TestUserRepository(unittest.TestCase):
@@ -70,3 +71,25 @@ class TestUserRepository(unittest.TestCase):
 
         error_text = "A technical error occurred during inserting user, please contact admin."
         self.assertEqual(str(error.exception), error_text)
+
+    @patch("repositories.io.InputOutput.read")
+    def test_find_all_users_calls_read_method(self, read_mock):
+        self.repository.find_all_users()
+
+        read_mock.assert_called_with("SELECT id, username FROM users")
+
+    @patch("repositories.io.InputOutput.read")
+    def test_find_all_users_returns_correct_when_results(self, read_mock):
+        read_mock.return_value = [RowMock(1, "Groku")]
+
+        return_value = self.repository.find_all_users()
+
+        self.assertEqual(len(return_value), 1)
+        self.assertEqual(return_value[0].name, "Groku")
+        self.assertIsInstance(return_value[0], User)
+
+
+class RowMock():
+    def __init__(self, id, username,):
+        self.id = id
+        self.username = username

@@ -2,6 +2,7 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from repositories.io import InputOutput as default_io
 from utils.errors import InsertingError, ReadDatabaseError
+from entities.user import User
 
 
 class UserRepository():
@@ -28,3 +29,11 @@ class UserRepository():
 
         if not return_value:
             raise InsertingError("user")
+
+    def find_all_users(self):
+        query = "SELECT id, username FROM users"
+
+        try:
+            return [User(user.username, user.id) for user in self.db_io.read(query)]
+        except SQLAlchemyError:
+            raise ReadDatabaseError
