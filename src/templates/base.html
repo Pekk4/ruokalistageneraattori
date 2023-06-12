@@ -4,8 +4,10 @@
         {%- block head %}
         <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
         <script src="{{ url_for('static', filename='js/modal.js') }}"></script>
-        {% if not session.username -%}
+        {% if not session.username and not session.reset -%}
         <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+        {% elif session.reset and not session.username -%}
+        <script src="{{ url_for('static', filename='js/reset.js') }}"></script>
         {% endif -%}
         <title>Ruokalistageneraattori - {% block title %}{% endblock %}</title>
         {%- endblock %}
@@ -30,6 +32,8 @@
         {% if session.username -%}
             {% block content %}
             {% endblock %}
+        {% elif session.reset -%}
+            {% include "reset_password.html" %}
         {% else -%}
             {% include "main.html" %}
         {%- endif -%}

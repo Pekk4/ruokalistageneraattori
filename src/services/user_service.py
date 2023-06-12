@@ -32,6 +32,9 @@ class UserService:
 
             if not user:
                 return MESSAGES["no_user"]
+            
+            if user[0].password == "":
+                return user[0].id
 
             self.password_hasher.verify(user[0].password, password)
 
@@ -40,6 +43,18 @@ class UserService:
         except VerifyMismatchError:
             return MESSAGES["wrong_pass"]
         except ReadDatabaseError:
+            return MESSAGES["common_error"]
+
+    def change_password(self, user_id, password):
+        try:
+            self._validate_password(password)
+
+            hash_value = self.password_hasher.hash(password)
+
+            self.user_repository.set_user_password(user_id, hash_value, False)
+        except InvalidInputError as error:
+            return str(error)
+        except (InsertingError, HashingError):
             return MESSAGES["common_error"]
 
 
