@@ -31,9 +31,25 @@ class UserRepository():
             raise InsertingError("user")
 
     def find_all_users(self):
-        query = "SELECT id, username FROM users"
+        query = "SELECT id, username FROM users WHERE id NOT IN (1)"
 
         try:
             return [User(user.username, user.id) for user in self.db_io.read(query)]
         except SQLAlchemyError:
             raise ReadDatabaseError
+
+    def set_user_password(self, user_id, password = None, reset = True):
+        if not reset:
+            query = "UPDATE users SET password = (:password) WHERE id = (:user_id)"
+            parameters = {"user_id":user_id, "password":password}
+        else:
+            query = "UPDATE users SET password = '' WHERE id = (:user_id)"
+            parameters = {"user_id":user_id}
+
+        try:
+            return_value = self.db_io.write(query, parameters)
+        except SQLAlchemyError:
+            raise InsertingError("reset")
+
+        if not return_value:
+            raise InsertingError("reset")

@@ -28,3 +28,17 @@ def users():
         return render_template("users.html", users=users)
 
     return render_template("index.html")
+
+@admin_blueprint.route("/reset_password", methods=["GET"])
+def reset_password():
+    user_id = check_session(session, request)
+
+    if user_id and user_id == 1:
+        status = admin_service.reset_password(request.args.get("id"))
+
+        if isinstance(status, str):
+            return status, 500
+        
+        return "OK", 200
+
+    return "\N{angry face}", 403

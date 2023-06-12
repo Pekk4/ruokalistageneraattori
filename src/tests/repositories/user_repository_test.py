@@ -76,7 +76,7 @@ class TestUserRepository(unittest.TestCase):
     def test_find_all_users_calls_read_method(self, read_mock):
         self.repository.find_all_users()
 
-        read_mock.assert_called_with("SELECT id, username FROM users")
+        read_mock.assert_called_with("SELECT id, username FROM users WHERE id NOT IN (1)")
 
     @patch("repositories.io.InputOutput.read")
     def test_find_all_users_returns_correct_when_results(self, read_mock):
@@ -87,6 +87,50 @@ class TestUserRepository(unittest.TestCase):
         self.assertEqual(len(return_value), 1)
         self.assertEqual(return_value[0].name, "Groku")
         self.assertIsInstance(return_value[0], User)
+
+    @patch("repositories.io.InputOutput.read")
+    def test_find_all_users_raises_exception(self, read_mock):
+        read_mock.side_effect = SQLAlchemyError("No db connection")
+
+        with self.assertRaises(ReadDatabaseError):
+            self.repository.find_all_users()
+
+    @patch("repositories.io.InputOutput.write")
+    def test_reset_password_calls_write_method(self, write_mock):
+        query = "UPDATE users SET password = '' WHERE id = (:user_id)"
+
+        self.repository.set_user_password(1)
+
+        write_mock.assert_called_with(query, {"user_id":1})
+
+    @patch("repositories.io.InputOutput.write")
+    def test_reset_password_raises_exception_when_db_exception(self, write_mock):
+        write_mock.side_effect = SQLAlchemyError
+        error_text = "A technical error occurred during inserting reset, please contact admin."
+
+        with self.assertRaises(InsertingError) as error:
+            self.repository.set_user_password(1)
+
+        self.assertEqual(str(error.exception), error_text)
+
+    @patch("repositories.io.InputOutput.write")
+    def test_reset_password_raises_exception_when_no_results(self, write_mock):
+        write_mock.return_value = False
+
+        with self.assertRaises(InsertingError) as error:
+            self.repository.set_user_password(1)
+
+        error_text = "A technical error occurred during inserting reset, please contact admin."
+        self.assertEqual(str(error.exception), error_text)
+
+    @patch("repositories.io.InputOutput.write")
+    def test_set_password_calls_write_method_when_changing_password(self, write_mock):
+        password = "lohileipälautanen666!"
+        query = "UPDATE users SET password = (:password) WHERE id = (:user_id)"
+
+        self.repository.set_user_password(1, password, False)
+
+        write_mock.assert_called_with(query, {"user_id":1, "password":password})
 
 
 class RowMock():
