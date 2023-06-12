@@ -65,9 +65,9 @@ class MealService:
             if meal_name:
                 existing_meal = self.repository.find_single_meal(user_id, meal_name=meal_name)
         except InvalidInputError:
-            MESSAGES["input_error"]
+            return MESSAGES["input_error"]
         except (KeyError, ReadDatabaseError, NoResultsWarning):
-            MESSAGES["common_error"]
+            return MESSAGES["common_error"]
 
         if new_meal != existing_meal:
             try:

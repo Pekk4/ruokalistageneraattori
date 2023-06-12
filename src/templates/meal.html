@@ -119,7 +119,7 @@
         <div id="main-content" class="{% if meal or insert_mode %}hidden {% endif %}mt-16 mx-44 grid grid-cols-2 justify-center">
             <div title="Klikkaamalla ruokalajia pääset tarkastelemaan sen tietoja." class="bg-orange-100 border border-black rounded px-10 pb-5 mx-32 text-center">
                 <p class="font-bold text-xl text-center m-5">Ruokalajit:</p>
-                <div class="item-name border border-black rounded bg-orange-50 h-[500px] overflow-x-hidden overflow-y-auto text-left mb-5 py-3 w-full break-words">
+                <div class="border border-black rounded bg-orange-50 h-[500px] overflow-x-hidden overflow-y-auto text-left mb-5 py-3 w-full break-words">
                     {% for meal in meals -%}
                     <p class="px-5 hover:font-semibold"><a href="{{ url_for('index_blueprint.view_meal', meal_id=meal.db_id) }}">{{ meal }}</a></p>
                     {% endfor %}
@@ -128,7 +128,7 @@
                     Lisää ruokalaji
                 </button>
             </div>
-            <div title="Klikkaamalla raaka-ainetta pääset tarkastelemaan sen tietoja." class="bg-orange-100 border border-black rounded px-10 pb-10 mx-32 text-center">
+            <div class="bg-orange-100 border border-black rounded px-10 pb-10 mx-32 text-center">
                 <p class="font-bold text-xl text-center m-5">Raaka-aineet:</p>
                 <div class="border border-black rounded bg-orange-50 h-[500px] overflow-x-hidden overflow-y-auto text-left mb-2 py-3 w-full break-words">
                     {% for ingredient in ingredients -%}

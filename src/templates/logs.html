@@ -13,9 +13,6 @@
             </div>
             <div class="border border-black rounded bg-orange-50 h-[500px] overflow-x-hidden overflow-y-auto text-left mb-10 p-5 w-11/12 break-words">
                 {% autoescape false %}<p>{% if logs %}{{ logs }}{% else %}Ei lokitietueita.{% endif %}</p>{% endautoescape %}
-                {% for meal in meals %}
-                <p class="px-5 hover:font-semibold"><a href="{{ url_for('index_blueprint.view_meal', meal_id=meal.db_id) }}">{{ meal }}</a></p>
-                {% endfor %}
             </div>
         </div>
     {%- endblock -%}
