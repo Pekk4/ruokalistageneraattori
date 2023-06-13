@@ -12,6 +12,8 @@ CREATE TABLE meal_ingredients (meal_id INTEGER REFERENCES meals ON DELETE CASCAD
 
 CREATE TABLE recipes (id SERIAL PRIMARY KEY, meal_id INTEGER REFERENCES meals ON DELETE CASCADE,  name TEXT, recipe TEXT);
 
+CREATE TABLE news (id SERIAL PRIMARY KEY, topic TEXT, news TEXT);
+
 
 
 CREATE UNIQUE INDEX unique_menus_per_week_for_user ON menus (user_id, DATE_PART('week', timestamp), DATE_PART('year', timestamp));

@@ -20,7 +20,7 @@
             <div class="flex flex-col sm:flex-row justify-end items-end">
                 <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('admin_blueprint.users') }}">Käyttäjät</a></div>
                 <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('admin_blueprint.admin') }}">Loki</a></div>
-                <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('index_blueprint.view_meals') }}">Uutiset</a></div>
+                <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('admin_blueprint.admin_news') }}">Uutiset</a></div>
                 <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('login_blueprint.logout') }}">Kirjaudu ulos</a></div>
             </div>
             {%- endif %}
