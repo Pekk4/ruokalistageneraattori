@@ -1,21 +1,17 @@
-{%- extends "base.html" -%}
-    {%- block title -%}Tervetuloa!{%- endblock -%}
+{%- extends "admin_base.html" -%}
+    {%- block title -%}Uutiset{%- endblock -%}
     {%- block head -%}
         {{ super() }}
-        {%- if session.username %}
-        <script src="{{ url_for('static', filename='js/meal.js') }}"></script>
-        {%- endif %}
     {%- endblock -%}
     {%- block content -%}
     <form action="/submit_news" method="POST" class="h-full">
-
-        <div id="main-content" class="m-20 grid grid-cols-3 justify-center h-3/4">
-            <div name="write_news" class="bg-orange-100 border border-black rounded col-span-2 mx-6 p-10">
+        <div name="main-content" class="m-20 grid grid-cols-3 justify-center h-3/4">
+            <div name="write-news" class="bg-orange-100 border border-black rounded col-span-2 mx-6 p-10">
                 <div class="grid justify-center pb-5">
                     <p class="font-semibold m-1">Uutisen otsikko: <input name="topic" onclick="this.value = this.onclick = null;" class="border border-black rounded-md px-1 py-0.5 font-normal" value="Lyhyt ja ytimekäs otsikko"></p>
                 </div>
                 <div class="border border-black rounded-md h-3/4">
-                    <textarea name="news" onclick="this.value = this.onclick = null;" class="box-border h-full w-full p-3 scroll-smooth rounded-md">Tähän kenttään tulee itse uutinen.</textarea>
+                    <textarea name="news" onclick="this.value = this.onclick = null;" class="resize-none box-border h-full w-full p-3 scroll-smooth rounded-md">Tähän kenttään tulee itse uutinen.</textarea>
                 </div>
                 <div class="grid justify-center pt-7">
                     <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold px-24 py-4 border border-green-800 rounded">
@@ -23,28 +19,18 @@
                     </button>
                 </div>
             </div>
-            <div class="bg-orange-100 border border-black rounded  col-span-1 mx-6"></div>
+            <div name="list-news" class="bg-orange-100 border border-black rounded col-span-1 mx-6 h-full overflow-auto">
+                <div>
+                    <p class="text-xl text-center font-bold p-9">Viimeisimmät uutiset:</p>
+                </div>
+                {% for topic in news -%}
+                <div class="bg-orange-100 border border-black rounded mb-4 text-center hover:bg-white hover:cursor-pointer max-h-20 mx-6 px-5">
+                    <p class="font-semibold pt-2 pb-2">{{ topic }}</p>
+                    <p class="pb-3 px-2 truncate">{{ topic.news }}</p>
+                </div>
+                {%- endfor %}
+            </div>
         </div>
         <input id="csrf_token" type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     </form>
     {%- endblock -%}
-
-<!--<div title="Klikkaamalla ruokalajia pääset tarkastelemaan sen tietoja." class="bg-orange-100 border border-black rounded px-10 pb-5 mx-32 text-center">
-    <p class="font-bold text-xl text-center m-5">Ruokalajit:</p>
-    <div class="border border-black rounded bg-orange-50 h-[500px] overflow-x-hidden overflow-y-auto text-left mb-5 py-3 w-full break-words">
-        {% for meal in meals -%}
-        <p class="px-5 hover:font-semibold"><a href="{{ url_for('index_blueprint.view_meal', meal_id=meal.db_id) }}">{{ meal }}</a></p>
-        {% endfor %}
-    </div>
-    <button onclick="{% if meal %}location.replace('{{ url_for('index_blueprint.view_meals', new=0) }}'){% else %}addMeal(){% endif %}" class="m-5 bg-green-600 hover:bg-green-700 text-white font-bold px-2 py-1 border border-green-800 rounded">
-        Lisää ruokalaji
-    </button>
-</div>
-<div class="bg-orange-100 border border-black rounded px-10 pb-10 mx-32 text-center">
-    <p class="font-bold text-xl text-center m-5">Raaka-aineet:</p>
-    <div class="border border-black rounded bg-orange-50 h-[500px] overflow-x-hidden overflow-y-auto text-left mb-2 py-3 w-full break-words">
-        {% for ingredient in ingredients -%}
-        <p class="px-5 hover:font-semibold">{{ ingredient }}</p>
-        {%- endfor %}
-    </div>
-</div>-->

@@ -7,7 +7,7 @@
         {%- endif %}
     {%- endblock -%}
     {%- block content -%}
-        <div class="grid grid-rows-3 sm:grid-cols-3 sm:grid-rows-none place-content-center mt-20">
+        <div class="grid grid-rows-3 sm:grid-cols-3 sm:grid-rows-none place-content-center mt-20 h-3/4">
             <div class="bg-orange-100/90 border border-black my-10 mx-14 px-10 pt-2 pb-7 rounded ">
                 <div class="mx-10 mb-5 mt-5">
                     <p class="text-xl text-center font-bold">Viikon {{ today.isocalendar()[1] }} ruokalista</p>
@@ -43,18 +43,16 @@
                     </button>
                 </div>
             </div>
-            <div class="bg-orange-100/90 m-20 px-10 pt-2 pb-5 border border-black rounded">
+            <div class="bg-orange-100/90 m-20 px-10 pt-2 pb-5 border border-black rounded h-4/5 overflow-auto">
                 <div>
-                    <p class="font-bold text-xl m-5 text-center">Uusimmat reseptit</p>
+                    <p class="font-bold text-xl m-5 text-center">Viimeisimmät uutiset</p>
                 </div>
+                {% for article in news %}
                 <div class="bg-orange-100 border border-black rounded my-4 text-center hover:bg-white hover:cursor-pointer">
-                    <p class="font-semibold pt-2 pb-2">Raipe</p>
-                    <p class="pb-3 px-2">Lihaa ja perunaa!!</p>
+                    <p class="font-semibold pt-2 pb-2">{{ article }}</p>
+                    <p class="pb-3 px-2 truncate">{{ article.news }}</p>
                 </div>
-                <div class="bg-orange-100 border border-black rounded my-4 text-center hover:bg-white hover:cursor-pointer">
-                    <p class="font-semibold pt-2 pb-2">Marjatta69</p>
-                    <p class="pb-3 px-2">Hapansilakkavoileivät</p>
-                </div>
+                {% endfor %}
             </div>
         </div>
         <input id="csrf-token" type="hidden" value="{{ csrf_token() }}">

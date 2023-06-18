@@ -45,7 +45,19 @@ def reset_password():
 
 @admin_blueprint.route("/admin_news")
 def admin_news():
-    return render_template("admin_news.html")
+    user_id = check_session(session, request)
+
+    if user_id and user_id == 1:
+        news = admin_service.get_news()
+
+        if isinstance(news, str):
+            flash(news)
+
+            return redirect("/admin_news")
+        
+        return render_template("admin_news.html", news=news)
+    
+    return render_template("index.html")
 
 @admin_blueprint.route("/submit_news", methods=["POST"])
 def submit_news():

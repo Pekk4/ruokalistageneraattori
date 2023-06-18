@@ -35,3 +35,9 @@ class AdminService:
             self.news_repository.add_news(news_data["topic"], news_data["news"])
         except InsertingError:
             return MESSAGES["common_error"]
+
+    def get_news(self):
+        try:
+            return self.news_repository.find_all_news()
+        except ReadDatabaseError:
+            return MESSAGES["common_error"]

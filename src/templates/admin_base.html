@@ -10,7 +10,7 @@
         <title>Ruokalistageneraattori - {% block title %}{% endblock %}</title>
         {%- endblock %}
     </head>
-    <body class="bg-fixed bg-cover h-screen asm:overflow-hidden">
+    <body class="bg-fixed bg-cover h-screen sm:overflow-hidden">
         {%- block banner %}
         <div class="bg-gradient-to-b from-green-600/95 to-emerald-600/90 border-b-2 border-green-900/95 w-screen grid grid-cols-2 {% if not session.username %}absolute top-0{% endif %}">
             <div class="flex items-center justify-center {% if not session.username %}col-span-2{% endif %}">

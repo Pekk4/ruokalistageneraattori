@@ -2,6 +2,7 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from repositories.io import InputOutput as default_io
 from utils.errors import InsertingError, ReadDatabaseError
+from entities.news import News
 
 
 class NewsRepository():
@@ -19,3 +20,20 @@ class NewsRepository():
 
         if not return_value:
             raise InsertingError("news")
+
+    #def find_single_news(self, news_id):
+    #    query = "SELECT id, username, password FROM users WHERE username = :username"
+    #    parameters = {"username":username}
+    #
+    #    try:
+    #        return self.db_io.read(query, parameters)
+    #    except SQLAlchemyError:
+    #        raise ReadDatabaseError
+
+    def find_all_news(self):
+        query = "SELECT id, topic, news FROM news ORDER BY id DESC"
+
+        try:
+            return [News(news.topic, news.news, news.id) for news in self.db_io.read(query)]
+        except SQLAlchemyError:
+            raise ReadDatabaseError

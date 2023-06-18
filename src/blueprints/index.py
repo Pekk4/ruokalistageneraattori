@@ -6,6 +6,7 @@ from flask import Blueprint, redirect, render_template, flash, request, session
 from services.meal_service import MealService
 from services.menu_service import MenuService
 from utilities import DAYS, QTY_UNITS, check_session
+from services.admin_service import AdminService
 
 
 index_blueprint = Blueprint("index_blueprint", __name__)
@@ -20,13 +21,14 @@ def index():
 
     if user_id:
         menu = menu_service.fetch_menu(user_id)
+        news = AdminService().get_news()
 
         if isinstance(menu, str):
             return render_template("index.html", message=menu)
         if isinstance(menu, list):
             return render_template("index.html", menu=menu)
 
-        page = render_template("index.html", menu=zip(menu.meals, day_indexes))
+        page = render_template("index.html", menu=zip(menu.meals, day_indexes), news=news)
 
     return page
 
