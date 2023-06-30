@@ -1,4 +1,5 @@
 from datetime import date
+from config import logfiles_path
 
 
 DAYS = {
@@ -79,3 +80,10 @@ def check_session(session, request):
             session.clear()
 
     return False
+
+def get_logs():
+    log_path = logfiles_path + "/db_errors.log"
+    with open(log_path, "r") as file:
+        logs = file.read().replace("\n", "<br />")
+
+    return logs

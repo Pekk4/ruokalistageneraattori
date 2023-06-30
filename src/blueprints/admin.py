@@ -1,20 +1,22 @@
 from flask import Blueprint, render_template, request, session, redirect, flash
 
-from services.admin_service import AdminService
-from utilities import check_session
+from services.user_service import UserService
+from services.news_service import NewsService
+from utilities import check_session, get_logs
 
 
 admin_blueprint = Blueprint("admin_blueprint", __name__)
-admin_service = AdminService()
+user_service = UserService()
+news_service = NewsService()
 
 @admin_blueprint.route("/admin")
 def admin():
     user_id = check_session(session, request)
 
     if user_id and user_id == 1:
-        logs = admin_service.get_logs()
+        logs = get_logs()
 
-        return render_template("logs.html", logs=logs, paska=True)
+        return render_template("logs.html", logs=logs)
     
     return render_template("index.html")
 
@@ -23,7 +25,7 @@ def users():
     user_id = check_session(session, request)
 
     if user_id and user_id == 1:
-        users = admin_service.get_users()
+        users = user_service.get_users()
 
         return render_template("users.html", users=users)
 
@@ -34,7 +36,7 @@ def reset_password():
     user_id = check_session(session, request)
 
     if user_id and user_id == 1:
-        status = admin_service.reset_password(request.args.get("id"))
+        status = user_service.reset_password(request.args.get("id"))
 
         if isinstance(status, str):
             return status, 500
@@ -48,7 +50,7 @@ def admin_news():
     user_id = check_session(session, request)
 
     if user_id and user_id == 1:
-        news = admin_service.get_news()
+        news = news_service.get_news()
 
         if isinstance(news, str):
             flash(news)

@@ -21,14 +21,22 @@ class NewsRepository():
         if not return_value:
             raise InsertingError("news")
 
-    #def find_single_news(self, news_id):
-    #    query = "SELECT id, username, password FROM users WHERE username = :username"
-    #    parameters = {"username":username}
-    #
-    #    try:
-    #        return self.db_io.read(query, parameters)
-    #    except SQLAlchemyError:
-    #        raise ReadDatabaseError
+    def find_single_news(self, news_id):
+        query = "SELECT id, topic, news FROM news WHERE id = :id"
+        parameters = {"id":news_id}
+
+        try:
+            result = self.db_io.read(query, parameters)
+
+            if result:
+                news = result[0]
+
+                result = News(news.topic, news.news, news.id)
+
+            return result
+
+        except SQLAlchemyError:
+            raise ReadDatabaseError
 
     def find_all_news(self):
         query = "SELECT id, topic, news FROM news ORDER BY id DESC"

@@ -57,6 +57,18 @@ class UserService:
         except (InsertingError, HashingError):
             return MESSAGES["common_error"]
 
+    def get_users(self):
+        try:
+            return self.user_repository.find_all_users()
+        except ReadDatabaseError:
+            return MESSAGES["common_error"]
+
+    def reset_password(self, user_id):
+        try:
+            self.user_repository.set_user_password(user_id)
+        except InsertingError:
+            return MESSAGES["common_error"]
+
 
     @staticmethod
     def _validate_username(username):
