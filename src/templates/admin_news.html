@@ -24,10 +24,12 @@
                     <p class="text-xl text-center font-bold p-9">Viimeisimmät uutiset:</p>
                 </div>
                 {% for topic in news -%}
-                <div class="bg-orange-100 border border-black rounded mb-4 text-center hover:bg-white hover:cursor-pointer max-h-20 mx-6 px-5">
-                    <p class="font-semibold pt-2 pb-2">{{ topic }}</p>
-                    <p class="pb-3 px-2 truncate">{{ topic.news }}</p>
-                </div>
+                <a href="{{ url_for('index_blueprint.news', news_id=article.db_id )}}">
+                    <div class="bg-orange-100 border border-black rounded mb-4 text-center hover:bg-white hover:cursor-pointer max-h-20 mx-6 px-5">
+                        <p class="font-semibold pt-2 pb-2">{{ topic }}</p>
+                        <p class="pb-3 px-2 truncate">{{ topic.news }}</p>
+                    </div>
+                </a>
                 {%- endfor %}
             </div>
         </div>

@@ -163,7 +163,9 @@ def news(news_id=None):
         user_id = check_session(session, request)
 
         if user_id:
-            print(news_service.get_single_news(news_id))
+            news = news_service.get_single_news(news_id)
+
+            return render_template("news.html", news=news)
 
     return redirect("/")
 

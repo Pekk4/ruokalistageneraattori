@@ -71,7 +71,7 @@ def submit_news():
             "news": request.form["news"]
         }
 
-        status = admin_service.insert_news(news_data)
+        status = news_service.insert_news(news_data)
 
         if isinstance(status, str):
             flash(status)

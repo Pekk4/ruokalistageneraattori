@@ -1,0 +1,15 @@
+{% if admin %}{%- extends "base.html" -%}{% else %}{% extends "admin_base.html" %}{% endif %}
+    {%- block title -%}Tervetuloa!{%- endblock -%}
+    {%- block content -%}
+        <div id="main-content" class="bg-orange-100/90 my-24 mx-64 border border-black rounded grid place-items-center">
+            <div class="border border-black rounded bg-orange-100 m-20 p-12 text-center">
+                <div class="pb-12 text-center">
+                    <p class="text-3xl underline underline-offset-[12px] font-bold">{{ news.topic }}</p>
+                    <p class="mt-2">{{ news.date }} | Ylläpito</p>
+                </div>
+                <div>
+                    <p class="text-left px-5">{{ news.news }}</p>
+                </div>
+            </div>
+        </div>
+    {%- endblock -%}
