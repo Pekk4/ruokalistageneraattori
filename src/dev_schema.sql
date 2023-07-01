@@ -12,7 +12,7 @@ CREATE TABLE meal_ingredients (meal_id INTEGER REFERENCES meals ON DELETE CASCAD
 
 CREATE TABLE recipes (id SERIAL PRIMARY KEY, meal_id INTEGER REFERENCES meals ON DELETE CASCADE,  name TEXT, recipe TEXT);
 
-CREATE TABLE news (id SERIAL PRIMARY KEY, topic TEXT, news TEXT);
+CREATE TABLE news (id SERIAL PRIMARY KEY, topic TEXT, news TEXT, date DATE);
 
 
 

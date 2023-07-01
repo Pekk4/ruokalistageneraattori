@@ -10,7 +10,7 @@ class NewsRepository():
         self.db_io = database_io
 
     def add_news(self, topic, news):
-        query = "INSERT INTO news (topic, news) VALUES (:topic, :news)"
+        query = "INSERT INTO news (topic, news, date) VALUES (:topic, :news, NOW())"
         parameters = {"topic": topic, "news": news}
 
         try:
@@ -22,7 +22,9 @@ class NewsRepository():
             raise InsertingError("news")
 
     def find_single_news(self, news_id):
-        query = "SELECT id, topic, news FROM news WHERE id = :id"
+        query = """
+            SELECT id, topic, news, TO_CHAR(date, 'dd.mm.yyyy') as date
+            FROM news WHERE id = :id"""
         parameters = {"id":news_id}
 
         try:
@@ -31,7 +33,7 @@ class NewsRepository():
             if result:
                 news = result[0]
 
-                result = News(news.topic, news.news, news.id)
+                result = News(news.topic, news.news, news.date, news.id)
 
             return result
 
@@ -39,9 +41,13 @@ class NewsRepository():
             raise ReadDatabaseError
 
     def find_all_news(self):
-        query = "SELECT id, topic, news FROM news ORDER BY id DESC"
+        query = """
+            SELECT id, topic, news, TO_CHAR(date, 'dd.mm.yyyy') as date
+            FROM news ORDER BY date DESC, id DESC"""
 
         try:
-            return [News(news.topic, news.news, news.id) for news in self.db_io.read(query)]
+            results = self.db_io.read(query)
+
+            return [News(news.topic, news.news, news.date, news.id) for news in results]
         except SQLAlchemyError:
             raise ReadDatabaseError

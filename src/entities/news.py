@@ -1,8 +1,9 @@
 class News:
-    def __init__(self, topic: str, news: str, db_id: int = None):
+    def __init__(self, topic: str, news: str, date: str, db_id: int = None):
         self.topic = topic
         self.news = news
         self.db_id = db_id
+        self.date = date
 
     def __str__(self) -> str:
         return self.topic
