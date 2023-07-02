@@ -24,10 +24,12 @@ def index():
         menu = menu_service.fetch_menu(user_id)
         news = NewsService().get_news()
 
+        if isinstance(news, str):
+            news = []
         if isinstance(menu, str):
-            return render_template("index.html", message=menu)
+            return render_template("index.html", message=menu, news=news)
         if isinstance(menu, list):
-            return render_template("index.html", menu=menu)
+            return render_template("index.html", menu=menu, news=news)
 
         page = render_template("index.html", menu=zip(menu.meals, day_indexes), news=news)
 

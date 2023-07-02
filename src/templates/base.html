@@ -12,12 +12,20 @@
         <title>Ruokalistageneraattori - {% block title %}{% endblock %}</title>
         {%- endblock %}
     </head>
-    <body class="bg-fixed bg-cover h-screen asm:overflow-hidden">
+    <body class="bg-fixed bg-cover h-screen sm:overflow-hidden">
         {%- block banner %}
         <div class="bg-gradient-to-b from-green-600/95 to-emerald-600/90 border-b-2 border-green-900/95 w-screen grid grid-cols-2 {% if not session.username %}absolute top-0{% endif %}">
+            {%- if session.admin %}
+            <div class="flex flex-col sm:flex-row justify-start items-start">
+                <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('admin_blueprint.users') }}">Käyttäjät</a></div>
+                <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('admin_blueprint.logs') }}">Loki</a></div>
+                <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('admin_blueprint.admin_news') }}">Uutiset</a></div>
+            </div>
+            {% else %}
             <div class="flex items-center justify-center {% if not session.username %}col-span-2{% endif %}">
                 <p class="font-bold text-white text-lg text-shadow-sm-black {% if not session.username %}p-6{% endif %}"><a href="{{ url_for('index_blueprint.index') }}">Ruokalistageneraattori</a></p>
             </div>
+            {% endif %}
             {%- if session.username -%}
             <div class="flex flex-col sm:flex-row justify-end items-end">
                 <div onclick="location.replace('/')" class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('index_blueprint.index') }}">Etusivu</a></div>

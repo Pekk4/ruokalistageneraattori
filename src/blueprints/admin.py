@@ -9,11 +9,11 @@ admin_blueprint = Blueprint("admin_blueprint", __name__)
 user_service = UserService()
 news_service = NewsService()
 
-@admin_blueprint.route("/admin")
-def admin():
-    user_id = check_session(session, request)
+@admin_blueprint.route("/logs")
+def logs():
+    (user_id, is_admin) = check_session(session, request, True)
 
-    if user_id and user_id == 1:
+    if user_id and is_admin:
         logs = get_logs()
 
         return render_template("logs.html", logs=logs)
@@ -22,9 +22,9 @@ def admin():
 
 @admin_blueprint.route("/users")
 def users():
-    user_id = check_session(session, request)
+    (user_id, is_admin) = check_session(session, request, True)
 
-    if user_id and user_id == 1:
+    if user_id and is_admin:
         users = user_service.get_users()
 
         return render_template("users.html", users=users)
@@ -33,9 +33,9 @@ def users():
 
 @admin_blueprint.route("/reset_password", methods=["GET"])
 def reset_password():
-    user_id = check_session(session, request)
+    (user_id, is_admin) = check_session(session, request, True)
 
-    if user_id and user_id == 1:
+    if user_id and is_admin:
         status = user_service.reset_password(request.args.get("id"))
 
         if isinstance(status, str):
@@ -47,15 +47,15 @@ def reset_password():
 
 @admin_blueprint.route("/admin_news")
 def admin_news():
-    user_id = check_session(session, request)
+    (user_id, is_admin) = check_session(session, request, True)
 
-    if user_id and user_id == 1:
+    if user_id and is_admin:
         news = news_service.get_news()
 
         if isinstance(news, str):
             flash(news)
 
-            return redirect("/admin_news")
+            return redirect("/logs")
         
         return render_template("admin_news.html", news=news)
     
@@ -63,9 +63,9 @@ def admin_news():
 
 @admin_blueprint.route("/submit_news", methods=["POST"])
 def submit_news():
-    user_id = check_session(session, request)
+    (user_id, is_admin) = check_session(session, request, True)
 
-    if user_id and user_id == 1:
+    if user_id and is_admin:
         news_data = {
             "topic": request.form["topic"],
             "news": request.form["news"]

@@ -10,7 +10,7 @@ class UserRepository():
         self.db_io = database_io
 
     def find_single_user(self, username):
-        query = "SELECT id, username, password FROM users WHERE username = :username"
+        query = "SELECT id, username, password, is_admin FROM users WHERE username = :username"
         parameters = {"username":username}
 
         try:

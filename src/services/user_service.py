@@ -38,7 +38,7 @@ class UserService:
 
             self.password_hasher.verify(user[0].password, password)
 
-            return (user[0].username, user[0].id)
+            return (user[0].username, user[0].id, user[0].is_admin)
 
         except VerifyMismatchError:
             return MESSAGES["wrong_pass"]

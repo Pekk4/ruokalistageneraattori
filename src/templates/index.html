@@ -47,14 +47,20 @@
                 <div>
                     <p class="font-bold text-xl m-5 text-center">Viimeisimmät uutiset</p>
                 </div>
-                {% for article in news %}
-                <a href="{{ url_for('index_blueprint.news', news_id=article.db_id )}}">
-                    <div class="bg-orange-100 border border-black rounded my-4 text-center hover:bg-white hover:cursor-pointer">
-                        <p class="font-semibold pt-2 pb-2">{{ article }}</p>
-                        <p class="pb-3 px-2 truncate">{{ article.news }}</p>
-                    </div>
-                </a>
-                {% endfor %}
+                {%- if news %}
+                    {% for article in news %}
+                    <a href="{{ url_for('index_blueprint.news', news_id=article.db_id )}}">
+                        <div class="bg-orange-100 border border-black rounded my-4 text-center hover:bg-white hover:cursor-pointer">
+                            <p class="font-semibold pt-2 pb-2">{{ article }}</p>
+                            <p class="pb-3 px-2 truncate">{{ article.news }}</p>
+                        </div>
+                    </a>
+                    {% endfor %}
+                {%- else %}
+                <div class="text-center pt-40">
+                    <p class="">Ei uutisia.</p>
+                </div>
+                {%- endif %}
             </div>
         </div>
         <input id="csrf-token" type="hidden" value="{{ csrf_token() }}">

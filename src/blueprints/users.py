@@ -25,16 +25,17 @@ def login():
 
         return redirect("/")
     elif isinstance(user, tuple):
-        (uname, uid) = user
+        (uname, uid, is_admin) = user
 
         session["username"] = uname
         session["uid"] = uid
         session["uagent"] = request.user_agent.string
         session["remote_addr"] = request.remote_addr
+        session["admin"] = is_admin
     else:
         flash(user)
 
-    return redirect("/admin") if user[0] == ADMIN_NAME else redirect("/")
+    return redirect("/")
 
 @users_blueprint.route("/logout")
 def logout():
