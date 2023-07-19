@@ -6,11 +6,13 @@ from flask import Blueprint, redirect, render_template, flash, request, session
 from services.meal_service import MealService
 from services.menu_service import MenuService
 from utilities import DAYS, QTY_UNITS, check_session
+from services.news_service import NewsService
 
 
 index_blueprint = Blueprint("index_blueprint", __name__)
 meal_service = MealService()
 menu_service = MenuService()
+news_service = NewsService()
 day_indexes = list(range(7))
 
 @index_blueprint.route("/")
@@ -20,13 +22,16 @@ def index():
 
     if user_id:
         menu = menu_service.fetch_menu(user_id)
+        news = NewsService().get_news()
 
+        if isinstance(news, str):
+            news = []
         if isinstance(menu, str):
-            return render_template("index.html", message=menu)
+            return render_template("index.html", message=menu, news=news)
         if isinstance(menu, list):
-            return render_template("index.html", menu=menu)
+            return render_template("index.html", menu=menu, news=news)
 
-        page = render_template("index.html", menu=zip(menu.meals, day_indexes))
+        page = render_template("index.html", menu=zip(menu.meals, day_indexes), news=news)
 
     return page
 
@@ -153,6 +158,18 @@ def view_old_menus():
         page = render_template("old_menus.html", menus=menus)
 
     return page
+
+@index_blueprint.route("/news/<int:news_id>")
+def news(news_id=None):
+    if news_id:
+        user_id = check_session(session, request)
+
+        if user_id:
+            news = news_service.get_single_news(news_id)
+
+            return render_template("news.html", news=news)
+
+    return redirect("/")
 
 @index_blueprint.context_processor
 def utilities():

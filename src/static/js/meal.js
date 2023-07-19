@@ -131,22 +131,6 @@ function addMeal() {
     clearFields();
 }
 
-function toggleRecipe(hideInfo = true) {
-    const addMealButton = document.getElementById("add-meal-button");
-
-    if (hideInfo === true) {
-        document.getElementById("add-meal-info").classList.replace("flex", "hidden");
-        document.getElementById("recipe-div").classList.replace("hidden", "flex");
-        addMealButton.innerHTML = "Näytä ohjeet";
-        addMealButton.onclick = () => { toggleRecipe(false); };
-    } else {
-        document.getElementById("add-meal-info").classList.replace("hidden", "flex");
-        document.getElementById("recipe-div").classList.replace("flex", "hidden");
-        addMealButton.innerHTML = "Lisää resepti";
-        addMealButton.onclick = () => { toggleRecipe(); };
-    }
-}
-
 function removeRow(column) {
     const removableRow = column.parentElement;
     const ingredientsTbody = removableRow.parentElement;

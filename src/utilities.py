@@ -1,4 +1,5 @@
 from datetime import date
+from config import logfiles_path
 
 
 DAYS = {
@@ -69,13 +70,23 @@ def validate_year(year: int):
 
     raise ValueError("invalid year")
 
-def check_session(session, request):
+def check_session(session, request, check_admin = False):
     if "uid" in session:
         if (session["uagent"] == request.user_agent.string
                 and session["remote_addr"] == request.remote_addr):
+
+            if check_admin:
+                return (session["uid"], session["admin"])
 
             return session["uid"]
         else:
             session.clear()
 
     return False
+
+def get_logs():
+    log_path = logfiles_path + "/db_errors.log"
+    with open(log_path, "r") as file:
+        logs = file.read().replace("\n", "<br />")
+
+    return logs

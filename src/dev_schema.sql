@@ -1,4 +1,4 @@
-CREATE TABLE users (id SERIAL PRIMARY KEY, username TEXT UNIQUE NOT NULL, password VARCHAR(100) NOT NULL);
+CREATE TABLE users (id SERIAL PRIMARY KEY, username TEXT UNIQUE NOT NULL, password VARCHAR(100) NOT NULL, is_admin BOOLEAN);
 
 CREATE TABLE meals (id SERIAL PRIMARY KEY, name TEXT, user_id INTEGER REFERENCES users);
 
@@ -11,6 +11,8 @@ CREATE TABLE menu_meals (menu_id INTEGER REFERENCES menus, meal_id INTEGER REFER
 CREATE TABLE meal_ingredients (meal_id INTEGER REFERENCES meals ON DELETE CASCADE, ingredient_id INTEGER REFERENCES ingredients, quantity TEXT, qty_unit TEXT);
 
 CREATE TABLE recipes (id SERIAL PRIMARY KEY, meal_id INTEGER REFERENCES meals ON DELETE CASCADE,  name TEXT, recipe TEXT);
+
+CREATE TABLE news (id SERIAL PRIMARY KEY, topic TEXT, news TEXT, date DATE);
 
 
 
