@@ -93,7 +93,7 @@ def view_meal(meal_id=None):
             if isinstance(meals, str):
                 return render_template("meal.html", message=meals)
 
-            page = render_template("meal.html", meal=meal, meals=meals, ingredients=ingredients)
+            page = render_template("meal.html", meal=meal, meals=meals, ingredients=ingredients, update=True)
 
         return page
 
@@ -159,6 +159,7 @@ def view_old_menus():
 
     return page
 
+@index_blueprint.route("/news/")
 @index_blueprint.route("/news/<int:news_id>")
 def news(news_id=None):
     if news_id:

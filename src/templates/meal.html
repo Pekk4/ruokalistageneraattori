@@ -89,7 +89,7 @@
                         </div>
                     </div>
                     <div class="border border-black rounded bg-orange-100 mx-14 mt-8 grid {% if meal %}grid-cols-2{% endif %} place-items-center">
-                        <button onclick="submitMeal(false)" type="button" class=" bg-green-600 hover:bg-green-700 text-white font-bold px-24 py-4 border border-green-800 rounded">
+                        <button onclick="submitMeal({% if update %}){% else %}false){% endif %}" type="button" class=" bg-green-600 hover:bg-green-700 text-white font-bold px-24 py-4 border border-green-800 rounded">
                             Tallenna
                         </button>
                         {%- if meal -%}

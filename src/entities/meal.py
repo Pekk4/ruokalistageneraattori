@@ -8,4 +8,4 @@ class Meal:
         return self.name
 
     def __eq__(self, other: object) -> bool:
-        return self.name == other.name# and self.ingredients == other.ingredients
+        return self.name == other.name and self.ingredients == other.ingredients
