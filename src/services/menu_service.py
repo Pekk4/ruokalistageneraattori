@@ -89,3 +89,13 @@ class MenuService:
                 return True
         
         return MESSAGES["common_error"]
+
+    def fetch_menus_ingredients(self, user_id: int):
+        menu = self.fetch_menu(user_id)
+
+        if isinstance(menu, Menu):
+            ingredients = [ingredient for meal in menu.meals for ingredient in meal.ingredients]
+
+            return sorted(set(ingredients))
+        else:
+            return menu

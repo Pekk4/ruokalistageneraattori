@@ -172,6 +172,20 @@ def news(news_id=None):
 
     return redirect("/")
 
+@index_blueprint.route("/shopping_list")
+def shopping_list():
+    user_id = check_session(session, request)
+
+    if user_id:
+        ingredients = menu_service.fetch_menus_ingredients(user_id)
+
+        if not isinstance(ingredients, str):
+            return render_template("shopping_list.html", ingredients=ingredients)
+
+        return redirect("/manage")
+
+    return redirect("/")
+
 @index_blueprint.context_processor
 def utilities():
     return dict(today=datetime.today(), days=DAYS, day_numbers=list(range(7)), qty_units=QTY_UNITS)

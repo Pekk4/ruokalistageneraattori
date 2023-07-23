@@ -61,7 +61,7 @@
                 {%- endif %}
             </div>
             <div id="buttons" class="flex flex-row items-center m-12">
-                <button id="start-editing-button" {% if menu %} onClick="editMenu()" {% else %} onClick="activateNotifyModal('Generoi ensin ruokalista muokataksesi sitä.')" {% endif %} class="m-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 border border-green-800 rounded">
+                <button id="start-editing-button" {% if menu %}onClick="editMenu()"{% else %}onClick="activateNotifyModal('Generoi ensin ruokalista muokataksesi sitä.')"{% endif %} class="m-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 border border-green-800 rounded">
                     Muokkaa ruokalistaa
                 </button>
                 <button onclick="location.replace('/generate')" class="m-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 border border-green-800 rounded">
@@ -69,6 +69,9 @@
                 </button>
                 <button onclick="location.replace('/meals')" class="m-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 border border-green-800 rounded">
                     Lisää ruokalajeja
+                </button>
+                <button {% if menu %}onClick="window.open('{{ url_for('index_blueprint.shopping_list')}}', '_blank')"{% else %}onClick="activateNotifyModal('Generoi ensin ruokalista kerätäksesi ostoslistan.')"{% endif %} class="m-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 border border-green-800 rounded">
+                    Kerää ostoslista
                 </button>
             </div>
             <div id="former-menus-wrapper">
