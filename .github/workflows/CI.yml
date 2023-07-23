@@ -4,8 +4,8 @@ name: CI
 on:
   push:
     branches:
-      - master
-      - development
+      - masteri
+      - developmentti
   pull_request:
     branches:
       - master
