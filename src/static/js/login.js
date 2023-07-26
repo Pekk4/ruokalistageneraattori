@@ -16,7 +16,6 @@ function activateForm(action) {
     let animationInterval = setInterval(animateResize, 1);
 
     function animateResize() {
-        console.log("perse")
         widthCounter = widthCounter - 20;
 
         if (heightCounter <= 384) {
@@ -74,6 +73,8 @@ function askUsernameStatus(username) {
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             usernameFree = this.responseText;
+        } else if (this.readyState == 4 && this.status == 500) {
+            activateNotifyModal(this.responseText);
         }
     }
     xhttp.open("GET", "/check_username?uname="+username)
@@ -86,10 +87,10 @@ function checkUsernameStatus() {
     document.getElementById("uname-free-notification").style = "display: none";
 
     setTimeout(() => {
-        if (usernameFree == "OK") {
+        if (usernameFree == "True") {
             usernameFree = true
             unlockButton(true);
-        } else if (usernameFree == "NOK") {
+        } else if (usernameFree == "False") {
             usernameFree = false;
             document.getElementById("uname-free-notification").style = "";
         }

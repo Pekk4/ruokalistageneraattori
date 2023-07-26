@@ -69,6 +69,17 @@ class UserService:
         except InsertingError:
             return MESSAGES["common_error"]
 
+    def check_username_availability(self, username):
+        try:
+            user = self.user_repository.find_single_user(username)
+
+            if not user:
+                return True
+
+            return False
+        except ReadDatabaseError:
+            return MESSAGES["common_error"]
+
 
     @staticmethod
     def _validate_username(username):

@@ -4,12 +4,14 @@ from flask import Blueprint, jsonify, request, session
 
 from services.meal_service import MealService
 from services.menu_service import MenuService
+from services.user_service import UserService
 from utilities import check_session
 
 
 interfaces_blueprint = Blueprint("interfaces_blueprint", __name__)
 meal_service = MealService()
 menu_service = MenuService()
+user_service = UserService()
 message = "Please, log in first. \N{slightly smiling face}"
 
 @interfaces_blueprint.route("/get_meals")
@@ -124,4 +126,12 @@ def delete_meal():
 
 @interfaces_blueprint.route("/check_username", methods=["GET"])
 def check_username_availability():
-    return "OK", 200
+    if request.args:
+        status = user_service.check_username_availability(request.args.get("uname"))
+
+        if isinstance(status, str):
+            return status, 500
+
+        return str(status), 200
+
+    return ":)", 200
