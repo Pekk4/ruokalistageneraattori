@@ -11,7 +11,6 @@
             <div id="header" class="p-12">
                 <p class="text-center text-2xl font-bold">Käyttäjät:</p>
             </div>
-            <!--<div class="border border-black rounded bg-orange-50 h-[500px] overflow-x-hidden overflow-y-auto text-left mb-10 p-5 w-11/12 break-words">-->
             <div class="border border-black rounded bg-orange-50 overflow-y-auto mb-20 max-h-[400px]">
                 <table class="m-5">
                     <thead>
@@ -23,7 +22,7 @@
                     <tbody>
                         {% for user in users %}
                         <tr>
-                            <td><p class="px-5"><a href="/">{{ user }}</a></p></td>
+                            <td><p class="px-5"><a href="{{ url_for('index_blueprint.index') }}">{{ user }}</a></p></td>
                             <td onClick="confirmResetPassword('{{ user.db_id }}', '{{ user.name }}')" class="flex justify-center m-2 hover:cursor-pointer"><img src="{{ url_for('static', filename='images/reset.png') }}"></td>
                         </tr>
                         {% endfor %}

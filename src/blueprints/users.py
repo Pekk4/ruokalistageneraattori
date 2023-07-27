@@ -6,7 +6,7 @@ from utilities import check_session
 
 
 service = UserService()
-users_blueprint = Blueprint("login_blueprint", __name__)
+users_blueprint = Blueprint("users_blueprint", __name__)
 
 @users_blueprint.route("/login", methods=["POST"])
 def login():

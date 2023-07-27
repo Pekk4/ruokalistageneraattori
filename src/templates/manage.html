@@ -84,8 +84,8 @@
                 <div id="former-menus" class="hidden relative border border-black bg-orange-100 mb-14 p-5 rounded">
                     <div onclick="toggleFormerMenus()" class="absolute top-1 right-1 hover:cursor-pointer"><img src="{{ url_for('static', filename='images/cancel.png') }}"></div>
                     <p class="px-5 py-3 font-semibold">Aiemmat ruokalistat:</p>{% for menu in old_menus %}{% set timestamp = menu.timestamp.isocalendar() %}
-                    <p class="px-5 hover:font-semibold"><a href="/old_menus?week={{ timestamp[1] }}&year={{ timestamp[0] }}">Viikko {{ timestamp[1] }} / {{ timestamp[0] }}</a></p>{% endfor %}
-                    <p class="px-5 pt-2 pb-3 hover:font-semibold"><a href="/old_menus">Näytä lisää...</a></p>
+                    <p class="px-5 hover:font-semibold"><a href="{{ url_for('index_blueprint.view_old_menus', week=timestamp[1], year=timestamp[0]) }}">Viikko {{ timestamp[1] }} / {{ timestamp[0] }}</a></p>{% endfor %}
+                    <p class="px-5 pt-2 pb-3 hover:font-semibold"><a href="{{ url_for('index_blueprint.view_old_menus') }}">Näytä lisää...</a></p>
                 </div>
                 {%- else -%}
                 <div id="former-menus-button" class="mb-14">
