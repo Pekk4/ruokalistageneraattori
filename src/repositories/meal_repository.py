@@ -123,7 +123,7 @@ class MealRepository():
         if not results:
             raise NoResultsWarning("No results from database.")
 
-        ingredients = [self._build_ingredient(result) for result in results]
+        ingredients = sorted([self._build_ingredient(result) for result in results])
 
         return Meal(results[0].meal_name, ingredients, results[0].meal_id)
 

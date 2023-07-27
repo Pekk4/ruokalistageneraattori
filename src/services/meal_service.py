@@ -17,7 +17,7 @@ class MealService:
         except ReadDatabaseError:
             return MESSAGES["common_error"]
 
-        return meals
+        return sorted(meals)
 
     def fetch_user_ingredients(self, user_id):
         try:
@@ -25,7 +25,7 @@ class MealService:
         except (NoResultsWarning, ReadDatabaseError):
             return []
 
-        return ingredients
+        return sorted(ingredients)
 
     def fetch_single_meal(self, user_id: int, meal_id: int):
         try:
