@@ -1,10 +1,10 @@
 from datetime import datetime
 
+from entities.menu import Menu
 from services.generator import GeneratorService
 from repositories.menu_repository import MenuRepository as default_repository
-from utils.errors import InsertingError, NotEnoughMealsError, ReadDatabaseError, NoResultsWarning
-from entities.menu import Menu
 from utils.utilities import MESSAGES, validate_week_number, validate_year
+from utils.errors import InsertingError, NotEnoughMealsError, ReadDatabaseError, NoResultsWarning
 
 
 class MenuService:

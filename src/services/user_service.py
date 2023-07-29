@@ -3,9 +3,9 @@ import re
 from argon2 import PasswordHasher
 from argon2.exceptions import HashingError, VerifyMismatchError
 
+from utils.utilities import MESSAGES
 from utils.errors import InsertingError, InvalidInputError, ReadDatabaseError
 from repositories.user_repository import UserRepository as default_repository
-from utils.utilities import MESSAGES
 
 
 class UserService:

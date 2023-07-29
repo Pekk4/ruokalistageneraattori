@@ -5,7 +5,7 @@ class InsertingError(Exception):
         super().__init__(message)
 
 class ReadDatabaseError(Exception):
-    def __init__(self, *args: object):
+    def __init__(self):
         message = "Error occurred while reading items from database. Please see log file."
 
         super().__init__(message)

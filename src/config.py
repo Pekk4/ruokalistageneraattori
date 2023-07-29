@@ -1,5 +1,4 @@
-from os import getenv, path, mkdir
-from shutil import rmtree
+from os import getenv, path
 from dotenv import load_dotenv
 
 
@@ -10,11 +9,6 @@ logfiles_path = path.abspath(path.join(dirname, "..", "logs"))
 if path.exists(envfile_path):
     load_dotenv(envfile_path)
 
-"""if not path.exists(logfiles_path):
-    rmtree("test_logs/", ignore_errors=True)
-    mkdir(logfiles_path)"""
-
-ADMIN_NAME = getenv("ADMIN_NAME")
 DATABASE_URL = getenv("DATABASE_URL")
 SECRET_KEY = getenv("SECRET_KEY")
 LOGGER_CONFIG_FILE = getenv("LOGGER_CONFIG_FILE")
