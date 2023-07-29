@@ -1,0 +1,18 @@
+{%- extends "base.html" -%}
+    {%- block title -%}Tervetuloa!{%- endblock -%}
+    {%- block head -%}
+        {{ super() }}
+        {%- if session.username %}
+        <script src="{{ url_for('static', filename='js/manage.js') }}"></script>
+        {%- endif %}
+    {%- endblock -%}
+    {%- block content -%}
+        <div id="main-content" class="bg-orange-100/90 m-20 border border-black rounded grid place-items-center">
+            <div id="header" class="p-12">
+                <p class="text-center text-2xl font-bold">Tietokantaloki:</p>
+            </div>
+            <div class="border border-black rounded bg-orange-50 h-[500px] overflow-x-hidden overflow-y-auto text-left mb-10 p-5 w-11/12 break-words">
+                {% autoescape false %}<p>{% if logs %}{{ logs }}{% else %}Ei lokitietueita.{% endif %}</p>{% endautoescape %}
+            </div>
+        </div>
+    {%- endblock -%}

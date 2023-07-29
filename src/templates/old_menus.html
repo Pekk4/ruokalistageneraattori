@@ -1,0 +1,59 @@
+{%- extends "base.html" -%}
+    {%- block title -%}Tervetuloa!{%- endblock -%}
+    {%- block head -%}
+        {{ super() }}
+        {%- if session.username %}
+        <script>
+            function confirmReplaceMenu() {
+                const queryString = window.location.search;
+                const confirmText = "Haluatko varmasti vaihtaa menun nykyiseksi?"
+
+                activateAskModal(confirmText, replaceMenu);
+
+                function replaceMenu() {
+                    const xhttp = new XMLHttpRequest();
+
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            location.replace("/manage")
+                        } else if (this.readyState == 4 && this.status == 500) {
+                            activateNotifyModal(this.responseText);
+                        } else {
+                            activateSpinnerModal();
+                        }
+                    }
+                    xhttp.open("GET", "/replace_menu"+queryString);
+                    xhttp.send();
+                }
+            }
+        </script>
+        {%- endif %}
+    {%- endblock -%}
+    {%- block content -%}
+        <div class="{% if selected_menu %}border border-black rounded bg-orange-100/90 {% endif %}m-14 grid place-items-center overflow-hidden">
+            <div class="{% if not selected_menu %}hidden{% endif %} p-12">
+                <p class="text-center text-2xl font-bold">{% if timestamp %}Viikon {{ timestamp[1] }} / {{ timestamp[0] }} ruokalista:{% endif %}</p>
+            </div>
+            <div>
+                <div class="grid grid-cols-7 text-center border-b rounded-b border-t border-l border-black rounded-t">
+                    {% for meal, day in selected_menu -%}
+                    <div class="p-3 border-r border-black bg-orange-100 hover:bg-white {% if day == 0 %}rounded-tl rounded-bl{% elif day == 6 %}rounded-tr rounded-br{% endif %}">
+                        <p class="p-1 font-semibold">{{ days[day] }}:</p>
+                        <p class="p-1">{{ meal }}</p>
+                    </div>
+                    {%- endfor %}
+                </div>
+            </div>
+            <button onclick="confirmReplaceMenu()" class="{% if not selected_menu %}hidden{% endif %} m-14 bg-green-600 hover:bg-green-700 text-white font-bold px-2 py-1 border border-green-800 rounded">
+                Vaihda nykyiseksi ruokalistaksi
+            </button>
+            {% if menus -%}
+            <div class="{% if not selected_menu %}max-h-[30rem] m-14{% else %}max-h-52 mb-14{% endif %} overflow-y-scroll bg-orange-100 border border-black rounded pb-3">
+                <p class="px-5 py-3 font-semibold">Aiemmat ruokalistat:</p>
+                {%- for menu in menus -%}{% set timestamp = menu.timestamp.isocalendar() %}
+                <p class="px-5 hover:font-semibold"><a href="{{ url_for('index_blueprint.view_old_menus', week=timestamp[1], year=timestamp[0]) }}">Viikko {{ timestamp[1] }} / {{ timestamp[0] }}</a></p>
+                {%- endfor %}
+            </div>
+            {%- endif %}
+        </div>
+    {%- endblock -%}

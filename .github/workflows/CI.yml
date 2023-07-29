@@ -4,8 +4,8 @@ name: CI
 on:
   push:
     branches:
-      - master
-      - development
+      - masteri
+      - developmentti
   pull_request:
     branches:
       - master
@@ -21,10 +21,14 @@ jobs:
         with:
           python-version: 3.9
       - name: Install dependencies
-        run: pip install -r requirements
+        run: pip install -r requirements.txt
       - name: Run pylint
         run: pylint src --rcfile=".pylintrc"
       - name: Run tests
-        run: coverage run --branch -m pytest
+        run: coverage run --branch -m pytest src
       - name: Coverage report
         run: coverage xml
+      - name: Coverage report to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

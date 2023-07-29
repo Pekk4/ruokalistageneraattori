@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fi-FI">
+    <head>
+        {%- block head %}
+        <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+        <script src="{{ url_for('static', filename='js/modal.js') }}"></script>
+        {% if not session.username and not session.reset -%}
+        <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+        {% elif session.reset and not session.username -%}
+        <script src="{{ url_for('static', filename='js/reset.js') }}"></script>
+        {% endif -%}
+        <title>Ruokalistageneraattori - {% block title %}{% endblock %}</title>
+        {%- endblock %}
+    </head>
+    <body class="bg-fixed bg-cover h-screen sm:overflow-hidden">
+        {%- block banner %}
+        <div class="bg-gradient-to-b from-green-600/95 to-emerald-600/90 border-b-2 border-green-900/95 w-screen grid grid-cols-2 {% if not session.username %}absolute top-0{% endif %}">
+            {%- if session.admin %}
+            <div class="flex flex-col sm:flex-row justify-start items-start">
+                <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('admin_blueprint.users') }}">Käyttäjät</a></div>
+                <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('admin_blueprint.logs') }}">Loki</a></div>
+                <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('admin_blueprint.admin_news') }}">Uutiset</a></div>
+            </div>
+            {% else %}
+            <div class="flex items-center justify-center {% if not session.username %}col-span-2{% endif %}">
+                <p class="font-bold text-white text-lg text-shadow-sm-black {% if not session.username %}p-6{% endif %}"><a href="{{ url_for('index_blueprint.index') }}">Ruokalistageneraattori</a></p>
+            </div>
+            {% endif %}
+            {%- if session.username -%}
+            <div class="flex flex-col sm:flex-row justify-end items-end">
+                <div onclick="location.replace('/')" class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('index_blueprint.index') }}">Etusivu</a></div>
+                <div onclick="location.replace('/manage')" class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('index_blueprint.manage_menus') }}">Ruokalistat</a></div>
+                <div onclick="location.replace('/meals')" class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('index_blueprint.view_meals') }}">Ruokalajit</a></div>
+                <div onclick="location.replace('/logout')" class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('users_blueprint.logout') }}">Kirjaudu ulos</a></div>
+            </div>
+            {%- endif %}
+        </div>
+        {% endblock -%}
+        {% if session.username -%}
+            {% block content %}
+            {% endblock %}
+        {% elif session.reset -%}
+            {% include "reset_password.html" %}
+        {% else -%}
+            {% include "main.html" %}
+        {%- endif -%}
+        {% include "modal.html" %}
+        {%- with messages = get_flashed_messages() %}
+            {%- autoescape false %}
+                {%- if message %}
+                <script>activateNotifyModal("{{ message }}", true);</script>
+                {%- elif messages %}
+                <script>activateNotifyModal("{{ messages[0] }}", true);</script>
+                {%- endif %}
+            {%- endautoescape %}
+        {%- endwith %}
+    </body>
+</html>
