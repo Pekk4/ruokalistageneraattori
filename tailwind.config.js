@@ -7,6 +7,7 @@ module.exports = {
         //'62': '15.5rem',
         '62': '80rem',
         '100': '650px',
+        '11/12': '90%',
       },
       borderWidth: {
         DEFAULT: '1px',
