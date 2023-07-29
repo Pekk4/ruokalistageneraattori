@@ -27,6 +27,9 @@ def users():
     if user_id and is_admin:
         users = user_service.get_users()
 
+        if isinstance(users, str):
+            return render_template("users.html", message=users)
+
         return render_template("users.html", users=users)
 
     return render_template("index.html")

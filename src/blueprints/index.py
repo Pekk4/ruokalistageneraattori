@@ -106,19 +106,19 @@ def manage_menus():
 
     if user_id:
         menu = menu_service.fetch_menu(user_id)
-        older_menus = menu_service.fetch_old_menus(user_id, 35)
+        old_menus = menu_service.fetch_old_menus(user_id, 35)
 
         if isinstance(menu, str):
             return render_template("manage.html", message=menu)
-        if isinstance(older_menus, str):
-            return render_template("manage.html", message=older_menus)
+        if isinstance(old_menus, str):
+            return render_template("manage.html", message=old_menus)
         if isinstance(menu, list):
-            return render_template("manage.html", older_menus=older_menus, menu=menu)
+            return render_template("manage.html", old_menus=old_menus, menu=menu)
 
         page = (
             render_template(
                 "manage.html",
-                old_menus=older_menus,
+                old_menus=old_menus,
                 menu=zip(menu.meals, day_indexes)
             )
         )
