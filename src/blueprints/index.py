@@ -6,7 +6,7 @@ from flask import Blueprint, redirect, render_template, flash, request, session
 from services.meal_service import MealService
 from services.menu_service import MenuService
 from services.news_service import NewsService
-from utilities import DAYS, QTY_UNITS, check_session
+from utils.utilities import DAYS, QTY_UNITS, check_session
 
 
 index_blueprint = Blueprint("index_blueprint", __name__)

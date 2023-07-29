@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, request, session
 from services.meal_service import MealService
 from services.menu_service import MenuService
 from services.user_service import UserService
-from utilities import check_session
+from utils.utilities import check_session
 
 
 interfaces_blueprint = Blueprint("interfaces_blueprint", __name__)

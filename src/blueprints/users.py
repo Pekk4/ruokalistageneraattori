@@ -1,7 +1,7 @@
 from flask import redirect, Blueprint, request, session, flash
 
 from services.user_service import UserService
-from utilities import check_session
+from utils.utilities import check_session
 
 
 service = UserService()

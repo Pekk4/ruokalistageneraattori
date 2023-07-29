@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, session, redirect, flash
 
 from services.user_service import UserService
 from services.news_service import NewsService
-from utilities import check_session, read_logs
+from utils.utilities import check_session, read_logs
 
 
 admin_blueprint = Blueprint("admin_blueprint", __name__)

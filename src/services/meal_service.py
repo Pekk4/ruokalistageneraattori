@@ -3,7 +3,7 @@ from entities.meal import Meal
 from repositories.meal_repository import MealRepository as default_repository
 from utils.errors import (InsertingError, InvalidInputError, MealExistsWarning, NoResultsWarning,
     ReadDatabaseError)
-from utilities import MESSAGES
+from utils.utilities import MESSAGES
 
 class MealService:
     def __init__(self, repository=default_repository()):

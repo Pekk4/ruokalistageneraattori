@@ -1,5 +1,5 @@
 from utils.errors import InsertingError, ReadDatabaseError
-from utilities import MESSAGES
+from utils.utilities import MESSAGES
 from repositories.news_repository import NewsRepository
 
 
