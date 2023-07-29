@@ -26,13 +26,15 @@ class UserService:
         except (InsertingError, HashingError):
             return MESSAGES["common_error"]
 
+        return True
+
     def login_user(self, username, password):
         try:
             user = self.user_repository.find_single_user(username)
 
             if not user:
                 return MESSAGES["no_user"]
-            
+
             if user[0].password == "":
                 return user[0].id
 
@@ -57,6 +59,8 @@ class UserService:
         except (InsertingError, HashingError):
             return MESSAGES["common_error"]
 
+        return True
+
     def get_users(self):
         try:
             return self.user_repository.find_all_users()
@@ -68,6 +72,8 @@ class UserService:
             self.user_repository.set_user_password(user_id)
         except InsertingError:
             return MESSAGES["common_error"]
+
+        return True
 
     def check_username_availability(self, username):
         try:
@@ -85,10 +91,10 @@ class UserService:
     def _validate_username(username):
         if len(username.strip()) < 5 or len(username) > 16:
             raise InvalidInputError(MESSAGES["invalid_pass"])
-    
+
     @staticmethod
     def _validate_password(password):
-        if (len(password.strip()) < 8 or not re.match(".*[\d]+", password) or
-            not re.match(".*[\W_]+", password)):
+        if (len(password.strip()) < 8 or not re.match(r".*[\d]+", password) or
+            not re.match(r".*[\W_]+", password)):
 
             raise InvalidInputError(MESSAGES["invalid_uname"])

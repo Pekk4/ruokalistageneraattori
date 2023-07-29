@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, session, redirect, flash
 
 from services.user_service import UserService
 from services.news_service import NewsService
-from utilities import check_session, get_logs
+from utilities import check_session, read_logs
 
 
 admin_blueprint = Blueprint("admin_blueprint", __name__)
@@ -10,18 +10,18 @@ user_service = UserService()
 news_service = NewsService()
 
 @admin_blueprint.route("/logs")
-def logs():
+def get_logs():
     (user_id, is_admin) = check_session(session, request, True)
 
     if user_id and is_admin:
-        logs = get_logs()
+        logs = read_logs()
 
         return render_template("logs.html", logs=logs)
-    
+
     return render_template("index.html")
 
 @admin_blueprint.route("/users")
-def users():
+def get_users():
     (user_id, is_admin) = check_session(session, request, True)
 
     if user_id and is_admin:
@@ -43,7 +43,7 @@ def reset_password():
 
         if isinstance(status, str):
             return status, 500
-        
+
         return "OK", 200
 
     return "\N{angry face}", 403
@@ -59,9 +59,9 @@ def admin_news():
             flash(news)
 
             return redirect("/logs")
-        
+
         return render_template("admin_news.html", news=news)
-    
+
     return render_template("index.html")
 
 @admin_blueprint.route("/submit_news", methods=["POST"])

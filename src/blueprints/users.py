@@ -1,6 +1,5 @@
-from flask import redirect, Blueprint, request, session, flash, render_template
+from flask import redirect, Blueprint, request, session, flash
 
-from config import ADMIN_NAME
 from services.user_service import UserService
 from utilities import check_session
 
@@ -24,7 +23,7 @@ def login():
         flash("Salasanasi on resetoitu, aseta uusi salasana.")
 
         return redirect("/")
-    elif isinstance(user, tuple):
+    if isinstance(user, tuple):
         (uname, uid, is_admin) = user
 
         session["username"] = uname
@@ -50,13 +49,13 @@ def register():
 
     message = service.insert_new_user(username, password)
 
-    if message:
+    if message and not isinstance(message, bool):
         flash(message)
 
     return redirect("/")
 
 @users_blueprint.route("/password", methods=["POST"])
-def password():
+def reset_password():
     user_id = check_session(session, request)
 
     if user_id:

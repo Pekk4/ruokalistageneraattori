@@ -79,14 +79,14 @@ def check_session(session, request, check_admin = False):
                 return (session["uid"], session["admin"])
 
             return session["uid"]
-        else:
-            session.clear()
+
+        session.clear()
 
     return False
 
-def get_logs():
+def read_logs():
     log_path = logfiles_path + "/db_errors.log"
-    with open(log_path, "r") as file:
+    with open(log_path, "r", encoding='UTF-8') as file:
         logs = file.read().replace("\n", "<br />")
 
     return logs

@@ -90,13 +90,15 @@ class MealService:
         except (KeyError, ReadDatabaseError, InsertingError, NoResultsWarning):
             return MESSAGES["common_error"]
 
+        return True
+
     def _prepare_meal(self, meal_data):
         try:
             self._check_inputs(meal_data)
 
             meal = self._build_meal_from_json(meal_data)
-        except (InvalidInputError, KeyError):
-            raise
+        except (InvalidInputError, KeyError) as original_error:
+            raise original_error
 
         return meal
 
@@ -105,7 +107,7 @@ class MealService:
     def _check_inputs(input_data: dict):
         meal_name = input_data["meal_name"]
         ingredient_name = input_data["ingredients"][0]["ingredient_name"]
-        
+
         if len(meal_name.split()) == 0 or len(ingredient_name.split()) == 0:
             raise InvalidInputError
 
@@ -125,5 +127,5 @@ class MealService:
             )
 
         meal.ingredients = ingredients
-        
+
         return meal

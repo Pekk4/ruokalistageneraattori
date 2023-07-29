@@ -13,6 +13,8 @@ class NewsService:
         except InsertingError:
             return MESSAGES["common_error"]
 
+        return True
+
     def get_news(self):
         try:
             return self.repository.find_all_news()

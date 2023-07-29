@@ -14,8 +14,8 @@ class GeneratorService:
         generated_menu = []
         try:
             meals = self.repository.find_all_meals(user_id)
-        except NoResultsWarning:
-            raise NotEnoughMealsError
+        except NoResultsWarning as original_error:
+            raise NotEnoughMealsError from original_error
 
         if len(meals) < 7:
             raise NotEnoughMealsError("Not enough meals in the database")

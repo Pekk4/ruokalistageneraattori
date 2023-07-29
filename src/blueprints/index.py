@@ -5,8 +5,8 @@ from flask import Blueprint, redirect, render_template, flash, request, session
 
 from services.meal_service import MealService
 from services.menu_service import MenuService
-from utilities import DAYS, QTY_UNITS, check_session
 from services.news_service import NewsService
+from utilities import DAYS, QTY_UNITS, check_session
 
 
 index_blueprint = Blueprint("index_blueprint", __name__)
@@ -43,7 +43,7 @@ def generate_menu():
     if user_id:
         message = menu_service.generate_menu(user_id)
 
-        if message:
+        if message and not isinstance(message, bool):
             flash(message)
 
     if header_path == "/manage":
@@ -93,7 +93,13 @@ def view_meal(meal_id=None):
             if isinstance(meals, str):
                 return render_template("meal.html", message=meals)
 
-            page = render_template("meal.html", meal=meal, meals=meals, ingredients=ingredients, update=True)
+            page = render_template(
+                "meal.html",
+                meal=meal,
+                meals=meals,
+                ingredients=ingredients,
+                update=True
+            )
 
         return page
 
@@ -161,7 +167,7 @@ def view_old_menus():
 
 @index_blueprint.route("/news/")
 @index_blueprint.route("/news/<int:news_id>")
-def news(news_id=None):
+def get_news(news_id=None):
     if news_id:
         user_id = check_session(session, request)
 

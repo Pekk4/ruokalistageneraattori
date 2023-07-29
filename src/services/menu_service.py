@@ -31,6 +31,8 @@ class MenuService:
         except (InsertingError, ReadDatabaseError):
             return MESSAGES["common_error"]
 
+        return True
+
     def generate_meal(self, user_id):
         try:
             menu = self.repository.fetch_current_menu(user_id)
@@ -50,6 +52,8 @@ class MenuService:
             self.repository.replace_menu_meal(user_id, meal_id, day)
         except (ValueError, TypeError, InsertingError):
             return MESSAGES["common_error"]
+
+        return True
 
     def fetch_old_menus(self, user_id: int, limit_rows: int=False):
         try:
@@ -87,7 +91,7 @@ class MenuService:
                 return MESSAGES["common_error"]
             else:
                 return True
-        
+
         return MESSAGES["common_error"]
 
     def fetch_menus_ingredients(self, user_id: int):
@@ -97,5 +101,5 @@ class MenuService:
             ingredients = [ingredient for meal in menu.meals for ingredient in meal.ingredients]
 
             return sorted(set(ingredients))
-        else:
-            return menu
+
+        return menu

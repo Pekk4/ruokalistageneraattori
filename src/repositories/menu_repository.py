@@ -20,8 +20,8 @@ class MenuRepository():
 
         try:
             menu_id = self.db_io.write(query, parameters)
-        except (SQLAlchemyError, IntegrityError):
-            raise InsertingError("menu")
+        except (SQLAlchemyError, IntegrityError) as original_error:
+            raise InsertingError("menu") from original_error
 
         if not menu_id:
             raise InsertingError("menu")
@@ -32,14 +32,16 @@ class MenuRepository():
 
     def _insert_menu_meals(self, menu_id: int, meals: list):
         delete_query = "DELETE FROM menu_meals WHERE menu_id = :menu_id"
-        insert_query = "INSERT INTO menu_meals (menu_id, meal_id, day_of_week) VALUES (:menu_id, :meal_id, :day)"
+        insert_query = """
+            INSERT INTO menu_meals (menu_id, meal_id, day_of_week)
+            VALUES (:menu_id, :meal_id, :day)"""
         meals = [{"menu_id":menu_id, "meal_id":meal.db_id, "day":i} for i, meal in enumerate(meals)]
 
         try:
             self.db_io.write(delete_query, {"menu_id": menu_id})
             self.db_io.write_many(insert_query, meals)
-        except (SQLAlchemyError, IntegrityError):
-            raise InsertingError("menu")
+        except (SQLAlchemyError, IntegrityError) as original_error:
+            raise InsertingError("menu") from original_error
 
     def fetch_current_menu(self, user_id: int):
         query = """
@@ -56,8 +58,8 @@ class MenuRepository():
 
         try:
             results = self.db_io.read(query, parameters)
-        except SQLAlchemyError:
-            raise ReadDatabaseError
+        except SQLAlchemyError as original_error:
+            raise ReadDatabaseError from original_error
 
         if not results:
             raise NoResultsWarning
@@ -74,8 +76,8 @@ class MenuRepository():
 
         try:
             return self.db_io.write(query, parameters)
-        except (SQLAlchemyError, IntegrityError):
-            raise InsertingError("menu")
+        except (SQLAlchemyError, IntegrityError) as original_error:
+            raise InsertingError("menu") from original_error
 
     def fetch_old_menus(self, user_id: int, limit: int=False):
         query = """
@@ -92,8 +94,8 @@ class MenuRepository():
 
         try:
             results = self.db_io.read(query, parameters)
-        except SQLAlchemyError:
-            raise ReadDatabaseError
+        except SQLAlchemyError as original_error:
+            raise ReadDatabaseError from original_error
 
         if not results:
             raise NoResultsWarning
@@ -122,8 +124,8 @@ class MenuRepository():
 
         try:
             results = self.db_io.read(query, parameters)
-        except SQLAlchemyError:
-            raise ReadDatabaseError
+        except SQLAlchemyError as original_error:
+            raise ReadDatabaseError from original_error
 
         if not results:
             raise NoResultsWarning
@@ -145,12 +147,14 @@ class MenuRepository():
                         qty = item["quantity"],
                         qty_unit = item["qty_unit"],
                         db_id = item["ingredient_id"]
-                        )
                     )
+                )
 
             ingredients.sort()
 
-            meals.append(Meal(name=row.meal_name, ingredients=ingredients.copy(), db_id=row.meal_id))
+            meals.append(
+                Meal(name=row.meal_name, ingredients=ingredients.copy(), db_id=row.meal_id)
+            )
 
         return Menu(meals=meals, timestamp=sql_rows[0].timestamp, db_id=sql_rows[0].menu_id)
 

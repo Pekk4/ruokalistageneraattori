@@ -17,8 +17,8 @@
         <div class="bg-gradient-to-b from-green-600/95 to-emerald-600/90 border-b-2 border-green-900/95 w-screen grid grid-cols-2 {% if not session.username %}absolute top-0{% endif %}">
             {%- if session.admin %}
             <div class="flex flex-col sm:flex-row justify-start items-start">
-                <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('admin_blueprint.users') }}">Käyttäjät</a></div>
-                <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('admin_blueprint.logs') }}">Loki</a></div>
+                <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('admin_blueprint.get_users') }}">Käyttäjät</a></div>
+                <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('admin_blueprint.get_logs') }}">Loki</a></div>
                 <div class="hidden focus:inline-flex hover:cursor-pointer hover:bg-white text-white text-shadow-sm-black hover:text-shadow-none font-semibold hover:text-black sm:inline-block p-6 hover:px-[23px] hover:border-x border-black"><a href="{{ url_for('admin_blueprint.admin_news') }}">Uutiset</a></div>
             </div>
             {% else %}

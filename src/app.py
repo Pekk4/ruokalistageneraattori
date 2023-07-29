@@ -29,15 +29,3 @@ app.register_blueprint(admin_blueprint)
 app.register_blueprint(index_blueprint)
 app.register_blueprint(users_blueprint)
 app.register_blueprint(interfaces_blueprint)
-
-"""def create_app():"""
-
-# itemit tänne
-
-"""return app"""
-
-"""if __name__ == "__main__":
-    app = create_app()
-    #app.run(host="0.0.0.0", port="5000") #original, below is for testing loggers started with 'python3 app.py'
-    app.run(host="0.0.0.0", port="5000", debug=False, use_debugger=False, use_reloader=False)
-"""

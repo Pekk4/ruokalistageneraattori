@@ -12,7 +12,8 @@ interfaces_blueprint = Blueprint("interfaces_blueprint", __name__)
 meal_service = MealService()
 menu_service = MenuService()
 user_service = UserService()
-message = "Please, log in first. \N{slightly smiling face}"
+
+MESSAGE = "Please, log in first. \N{slightly smiling face}"
 
 @interfaces_blueprint.route("/get_meals")
 def get_meals():
@@ -26,7 +27,7 @@ def get_meals():
 
         return meals, 500
 
-    return message, 403
+    return MESSAGE, 403
 
 @interfaces_blueprint.route("/replace_meal", methods=["POST"])
 def replace_meal():
@@ -41,7 +42,7 @@ def replace_meal():
 
         return "OK", 201
 
-    return message, 403
+    return MESSAGE, 403
 
 @interfaces_blueprint.route("/generate_meal")
 def generate_meal():
@@ -55,7 +56,7 @@ def generate_meal():
 
         return jsonify({"meal":meal.name, "id":meal.db_id}), 200
 
-    return message, 403
+    return MESSAGE, 403
 
 @interfaces_blueprint.route("/replace_menu", methods=["GET"])
 def replace_menu():
@@ -70,7 +71,7 @@ def replace_menu():
 
         return "OK", 200
 
-    return message, 403
+    return MESSAGE, 403
 
 @interfaces_blueprint.route("/add_meal", methods=["POST", "GET"])
 def add_meal():
@@ -104,7 +105,7 @@ def add_meal():
 
         return "OK", 201
 
-    return message, 403
+    return MESSAGE, 403
 
 @interfaces_blueprint.route("/delete_meal", methods=["POST"])
 def delete_meal():
@@ -122,7 +123,7 @@ def delete_meal():
 
         return "OK", 201
 
-    return message, 403
+    return MESSAGE, 403
 
 @interfaces_blueprint.route("/check_username", methods=["GET"])
 def check_username_availability():

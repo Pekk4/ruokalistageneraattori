@@ -15,7 +15,8 @@ class MealRepository():
             SELECT m.id AS meal_id, m.name AS meal_name, json_agg(json_build_object('ingredient_id',
             i.id, 'ingredient_name', i.name, 'quantity', n.quantity, 'qty_unit', n.qty_unit))
             AS ingredients FROM meals m LEFT JOIN meal_ingredients n ON m.id = n.meal_id
-            LEFT JOIN ingredients i ON n.ingredient_id = i.id WHERE m.user_id = :user_id GROUP BY m.id;"""
+            LEFT JOIN ingredients i ON n.ingredient_id = i.id WHERE m.user_id = :user_id
+            GROUP BY m.id;"""
 
         parameters = {"user_id":user_id}
 
@@ -48,7 +49,9 @@ class MealRepository():
         query = """
             INSERT INTO ingredients (name, user_id) VALUES (:ingredient, :user_id) ON CONFLICT
             (name, user_id) DO UPDATE SET user_id = :user_id RETURNING id"""
-        parameters = [{"ingredient":ingredient.name, "user_id":user_id} for ingredient in meal.ingredients]
+        parameters = [
+            {"ingredient":ingredient.name, "user_id":user_id} for ingredient in meal.ingredients
+        ]
 
         try:
             database_ids = self.db_io.write_many(query, parameters)
