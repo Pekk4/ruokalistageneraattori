@@ -111,6 +111,10 @@ class MealService:
         if len(meal_name.split()) == 0 or len(ingredient_name.split()) == 0:
             raise InvalidInputError
 
+        for ingredient in input_data["ingredients"]:
+            if len(ingredient["ingredient_name"].split()) == 0 :
+                raise InvalidInputError
+
     @staticmethod
     def _build_meal_from_json(meal_data: dict):
         meal_name = meal_data["meal_name"].strip().capitalize()

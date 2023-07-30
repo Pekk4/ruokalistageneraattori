@@ -31,6 +31,7 @@
                                     <th><input name="qty" class="border border-black rounded-md px-1 py-0.5" size="5"></th>
                                     <th>
                                         <select name="unit">
+                                            <option selected></option>
                                             {% for unit in qty_units -%}
                                             <option>{{ unit }}</option>
                                             {% endfor %}
@@ -41,9 +42,10 @@
                                 <tr>
                                     <th class="hover:cursor-pointer px-1" onclick="removeRow(this, true)"><img src="{{ url_for('static', filename='images/cancel.png') }}"></th>
                                     <th><input name="ingredient_name" class="m-[1px] border border-black rounded-md px-1 py-0.5" value="{{ ingredient.name }}"></th>
-                                    <th><input name="qty" class="border border-black rounded-md px-1 py-0.5" size="5" value="{{ ingredient.qty }}"></th>
+                                    <th><input name="qty" class="border border-black rounded-md px-1 py-0.5" size="5" value="{% if ingredient.qty %}{{ ingredient.qty }}{% endif %}"></th>
                                     <th>
                                         <select name="unit" autocomplete="off">
+                                            <option {% if not ingredient.qty_unit %}selected{% endif %}></option>
                                             {% for unit in qty_units -%}
                                             <option{% if unit == ingredient.qty_unit %} selected{% endif %}>{{ unit }}</option>
                                             {% endfor %}
