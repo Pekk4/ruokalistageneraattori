@@ -1,0 +1,7 @@
+.git*
+*pylint*
+Makefile
+*README*
+package.json
+*tailwind*
+Dockerfile
