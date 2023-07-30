@@ -113,6 +113,9 @@ Kehitysversioon luodaan admin-käyttäjä automaattisesti tietokantaskeeman muka
 Ruokalajin nimeä ei voi vaihtaa muokkaustilassa, vaan ainoastaa raaka-aineita voi muuttaa. Syy toistaiseksi tuntematon.
 
 Lisäksi käyttäjien syötteille unohtui asettaa ylärajat, jonka huomasin olevan tarkistuslistassa vasta palautuspäivänä, mutta käyttäjän tunkiessa lorem ipsumia kentät täyteen kärsii hän pääsääntöisesti vain itse siitä, sillä sovelluksessa ei ole käyttäjien välistä toimintaa ollenkaan ja esimerkiksi salasana on tiivistefunktiosta johtuen aina saman pituinen.
+EDIT: ainakin näemmä rekisteröitymis-kentässä oli ylärajat pituuksille, mutta joistain kentistä taitaa puuttua...
+
+Mikäli ruokalajia lisätessä tai muokatessa tulee virheilmoitus, täytyy sivu ladata uudestaan, tai ilmoitus tulee aina uudestaan vaikkei virhettä enää olisikaan. Aika ei riittänyt korjata tätä.
 
 Sovelluksen lopputulos on melkoisen kokeellinen, sillä sitä kehittäessä tuli kokeiltua kaikenlaista ja näin ollen opittua paljon uutta. Sovelluksen pitkästä kehitysajasta johtuen taidot ovat kehittyneet myös muiden projektien myötä eteenpäin siten, että tämän projektin koodi ehti vanhentua pahasti projektin aikana. Valitettavasti ei ollut kuitenkaan mahdollista tehdä kaikkea uusiksi, vaikka mieli olisi kovasti tehnytkin monesti aloittaa puhtaalta pöydältä.
 
